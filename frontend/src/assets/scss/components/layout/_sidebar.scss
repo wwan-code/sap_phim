@@ -1,0 +1,145 @@
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1001;
+  pointer-events: none; // Mặc định không tương tác
+  transition: all 0.3s ease-in-out;
+
+  &--open {
+    pointer-events: all;
+
+    .sidebar__backdrop {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sidebar__content {
+      transform: translateX(0);
+    }
+  }
+
+  &__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(var(--w-background-color-rgb), 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  &__content {
+    position: relative;
+    width: 300px; // Chiều rộng sidebar
+    max-width: 80%; // Giới hạn chiều rộng trên màn hình nhỏ
+    height: 100%;
+    background-color: var(--w-sidebar-bg);
+    box-shadow: var(--w-box-shadow-lg);
+    transform: translateX(-100%); // Ẩn sidebar ban đầu
+    transition: transform 0.3s ease-in-out;
+    padding: var(--w-spacing-lg);
+    @include flex(column, flex-start, stretch);
+  }
+
+  &__header {
+    @include flex(row, space-between, center);
+    margin-bottom: var(--w-spacing-xl);
+  }
+
+  &__logo {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-xs);
+    text-decoration: none;
+    color: var(--w-text-color-inverted);
+    font-size: var(--w-font-size-xl);
+    font-weight: var(--w-font-weight-bold);
+
+    img {
+      height: 30px;
+      width: auto;
+    }
+  }
+
+  &__close-btn {
+    background: none;
+    border: none;
+    color: var(--w-text-color-inverted);
+    font-size: var(--w-font-size-xl);
+    cursor: pointer;
+  }
+
+  &__search {
+    @include flex(row, flex-start, center);
+    margin-bottom: var(--w-spacing-xl);
+  }
+
+  &__nav {
+    flex-grow: 1; // Đẩy footer xuống
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: var(--w-spacing-sm);
+
+        a {
+          @include flex(row, flex-start, center);
+          gap: var(--w-spacing-sm);
+          padding: var(--w-spacing-sm) var(--w-spacing-md);
+          color: var(--w-text-color-inverted);
+          text-decoration: none;
+          font-weight: var(--w-font-weight-medium);
+          border-radius: var(--w-border-radius);
+          transition: var(--w-transition-ease);
+
+          &:hover {
+            background-color: var(--w-primary-color-hover);
+            color: var(--w-text-color-inverted);
+          }
+
+          &.active {
+            background-color: var(--w-primary-color);
+            color: var(--w-text-color-inverted);
+          }
+        }
+      }
+    }
+  }
+
+  &__footer {
+    padding-top: var(--w-spacing-lg);
+    border-top: 1px solid rgba(var(--w-text-color-inverted-rgb), 0.2);
+    font-size: var(--w-font-size-sm);
+    color: var(--w-text-color-light);
+    text-align: center;
+
+    p {
+      margin-bottom: var(--w-spacing-xs);
+    }
+
+    .sidebar__social-links {
+      @include flex(row, center, center);
+      gap: var(--w-spacing-md);
+      margin-top: var(--w-spacing-md);
+
+      a {
+        color: var(--w-text-color-inverted);
+        font-size: var(--w-font-size-lg);
+        transition: var(--w-transition-ease);
+
+        &:hover {
+          color: var(--w-primary-color);
+        }
+      }
+    }
+  }
+}

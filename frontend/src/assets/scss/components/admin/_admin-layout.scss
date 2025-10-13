@@ -1,0 +1,75 @@
+// _admin-layout.scss
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--w-background-color);
+  color: var(--w-text-color);
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+    transition: padding-left var(--w-transition-ease);
+
+    @include breakpoint(desktop-and-above) {
+      padding-left: var(--w-sidebar-width-desktop);
+    }
+  }
+
+  &__content {
+    flex-grow: 1;
+    padding: var(--w-spacing-lg);
+    overflow-y: auto;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .admin-footer {
+    padding: var(--w-spacing-md) var(--w-spacing-xl);
+    background-color: var(--w-footer-bg);
+    color: var(--w-text-color-light);
+    text-align: center;
+    font-size: var(--w-font-size-sm);
+    border-top: var(--w-border-width) var(--w-border-style) var(--w-border-color);
+    @include flex(row, space-between, center);
+    flex-shrink: 0;
+
+    &__left {
+      // Styles for left content, e.g., copyright
+      font-weight: var(--w-font-weight-medium);
+    }
+
+    &__right {
+      // Styles for right content, e.g., links
+      @include flex(row, flex-end, center);
+      gap: var(--w-spacing-sm);
+    }
+  }
+
+  // Overlay for mobile/tablet when sidebar is open
+  &__overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: calc(var(--w-zindex-offcanvas) - 1);
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  // When sidebar is open on mobile/tablet
+  &--sidebar-open {
+    @include breakpoint(tablet-and-below) {
+      .admin-layout__overlay {
+        display: block;
+        opacity: 1;
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+@use '../mixins' as *;
+
+.friend-search {
+  padding: var(--w-spacing-md);
+
+  &__input-group {
+    @include flex(row, flex-start, center);
+    margin-bottom: var(--w-spacing-md);
+    border: 1px solid var(--w-border-color);
+    border-radius: var(--w-border-radius);
+    overflow: hidden;
+  }
+
+  &__input {
+    flex-grow: 1;
+    padding: var(--w-spacing-sm) var(--w-spacing-md);
+    border: none;
+    background-color: var(--w-input-bg);
+    color: var(--w-text-color);
+    font-size: var(--w-font-size-md);
+
+    &:focus {
+      outline: none;
+      background-color: var(--w-background-color-light);
+    }
+
+    @include placeholder {
+      color: var(--w-text-color-light);
+    }
+  }
+
+  &__btn {
+    @include button-style(var(--w-primary-color), var(--w-text-color-inverted));
+    border-radius: 0;
+    padding: var(--w-spacing-sm) var(--w-spacing-md);
+    font-size: var(--w-font-size-md);
+    border-left: 1px solid var(--w-border-color);
+
+    &:hover {
+      filter: brightness(0.9);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--w-spacing-md);
+
+    @include breakpoint(mobile) {
+      grid-template-columns: 1fr;
+    }
+  }
+}

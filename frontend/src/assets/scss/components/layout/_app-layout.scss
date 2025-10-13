@@ -1,0 +1,17 @@
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  &__main {
+    flex-grow: 1;
+
+    .page-section {
+      padding-top: calc(var(--w-header-height-desktop) + var(--w-spacing-xl));
+      padding-bottom: var(--w-spacing-lg);
+    }
+  }
+}

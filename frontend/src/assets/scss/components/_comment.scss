@@ -1,0 +1,992 @@
+// _comment.scss
+
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ==========================================================================
+// Comment Section
+// ==========================================================================
+.comment-section {
+  padding: var(--w-spacing-lg) 0;
+  background-color: var(--w-background-color);
+  color: var(--w-text-color);
+
+  &__header {
+    @include flex(row, space-between, center);
+    margin-bottom: var(--w-spacing-md);
+    padding: 0 var(--w-spacing-md);
+
+    @include breakpoint(mobile) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--w-spacing-sm);
+    }
+  }
+
+  &__title {
+    font-size: var(--w-font-size-h3);
+    margin-bottom: 0;
+    color: var(--w-text-color);
+  }
+
+  &__controls {
+    .comment-sort {
+      padding: var(--w-spacing-sm) var(--w-spacing-md);
+      border-radius: var(--w-border-radius);
+      border: 1px solid var(--w-border-color);
+      background-color: var(--w-input-bg);
+      color: var(--w-text-color);
+      font-size: var(--w-font-size-md);
+      cursor: pointer;
+      transition: var(--w-transition-ease);
+
+      &:hover {
+        border-color: var(--w-primary-color);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(var(--w-primary-color-rgb), 0.25);
+      }
+    }
+  }
+
+  &__form {
+    margin-bottom: var(--w-spacing-lg);
+    padding: 0 var(--w-spacing-md);
+  }
+
+  &__load-more {
+    @include flex(row, center, center);
+    padding: var(--w-spacing-md);
+
+    .load-more-btn {
+      @include button-style(var(--w-primary-color));
+      color: var(--w-text-color-inverted);
+      font-weight: var(--w-font-weight-semibold);
+
+      &:hover {
+        background-color: var(--w-primary-color-hover);
+      }
+
+      &--primary {
+        min-width: 200px;
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Comment List
+// ==========================================================================
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  &--replies {
+    position: relative; // For connector lines
+  }
+
+  // Connector lines for replies
+
+  &__item {
+    position: relative;
+    padding-left: var(--w-spacing-md); // Default padding for depth 0
+
+    &:has(ul) > .comment-item[data-nested=true] {
+      &[data-depth="0"] .comment-item__layout {
+        &:before {
+          content: "";
+          position: absolute;
+          left: calc(var(--avatar-size-0) / 2);
+          top: calc(var(--avatar-size-0) + var(--w-spacing-sm));
+          bottom: 0;
+          width: 2px;
+          background-color: rgba(var(--w-text-color-rgb), 1);
+          transform: translateX(-50%);
+        }
+      }
+
+      &[data-depth="1"] .comment-item__layout {
+        &:before {
+          content: "";
+          position: absolute;
+          left: calc(var(--avatar-size-1) / 2);
+          top: calc(var(--avatar-size-1) + var(--w-spacing-sm));
+          bottom: 0;
+          width: 2px;
+          background-color: rgba(var(--w-text-color-rgb), 1);
+          transform: translateX(-50%);
+        }
+      }
+
+      &[data-depth="2"] .comment-item__layout {
+        &:before {
+          content: "";
+          position: absolute;
+          left: calc(var(--avatar-size-1) / 2);
+          top: calc(var(--avatar-size-1) + var(--w-spacing-sm));
+          bottom: 0;
+          width: 2px;
+          background-color: rgba(var(--w-text-color-rgb), 1);
+          transform: translateX(-50%);
+        }
+      }
+    }
+  
+    // Indentation based on depth
+    &[data-depth="1"] {
+      padding-left: calc(var(--avatar-size-0) + var(--w-spacing-md)); // Indent for replies to root
+
+      @include breakpoint(mobile) {
+        padding-left: calc(var(--avatar-size-0-mobile) + var(--w-spacing-md));
+      }
+    }
+
+    &[data-depth="2"] {
+      padding-left: calc(var(--avatar-size-1) + var(--w-spacing-md)); // Indent for replies to replies
+
+      @include breakpoint(mobile) {
+        padding-left: calc(var(--avatar-size-0-mobile) + var(--avatar-size-1-mobile) + var(--w-spacing-md) * 2);
+      }
+    }
+
+    &[data-depth="1"]:not(:last-child) {
+      &::after {
+        content: '';
+        position: absolute;
+        left: calc(var(--avatar-size-0) / 2); // Center of parent avatar
+        top: calc(var(--w-spacing-md) * -1); // Start above the first reply
+        bottom: 0;
+        width: 2px;
+        background-color: rgba(var(--w-text-color-rgb), 1);
+        transform: translateX(-50%);
+        z-index: 0;
+
+        @include breakpoint(mobile) {
+          left: calc(var(--avatar-size-0-mobile) / 2);
+        }
+      }
+    }
+
+    // Curved line for replies
+    &[data-depth="1"]::before {
+      content: '';
+      position: absolute;
+      left: calc((var(--avatar-size-0) / 2) - 1px); // Align with parent's vertical line
+      top: calc(var(--w-spacing-sm) * -1);
+      width: calc(var(--avatar-size-0) / 2 + var(--w-spacing-sm)); // Horizontal part length
+      height: calc(var(--avatar-size-1) / 2 + var(--w-spacing-sm)); // Vertical part length
+      border-left: 2px solid rgba(var(--w-text-color-rgb), 1);
+      border-bottom: 2px solid rgba(var(--w-text-color-rgb), 1);
+      border-bottom-left-radius: var(--w-border-radius-lg);
+      z-index: 1;
+
+      @include breakpoint(mobile) {
+        left: calc((var(--avatar-size-0-mobile) / 2) - 1px);
+        width: calc(var(--avatar-size-0-mobile) / 2 + var(--w-spacing-sm));
+        height: calc(var(--avatar-size-1-mobile) / 2 + var(--w-spacing-sm));
+      }
+    }
+
+    &[data-depth="2"]:not(:last-child) {
+      &::after {
+        content: '';
+        position: absolute;
+        left: calc(var(--avatar-size-1) / 2); // Center of parent avatar
+        top: calc(var(--w-spacing-md) * -1); // Start above the first reply
+        bottom: 0;
+        width: 2px;
+        background-color: rgba(var(--w-text-color-rgb), 1);
+        transform: translateX(-50%);
+        z-index: 0;
+
+        @include breakpoint(mobile) {
+          left: calc(var(--avatar-size-1-mobile) / 2);
+        }
+      }
+    }
+
+    &[data-depth="2"]::before {
+      content: '';
+      position: absolute;
+      left: calc((var(--avatar-size-1) / 2) - 1px); // Align with parent's vertical line
+      top: calc(var(--w-spacing-sm) * -1);
+      width: calc(var(--avatar-size-1) / 2 + var(--w-spacing-sm)); // Horizontal part length
+      height: calc(var(--avatar-size-2) / 2 + var(--w-spacing-sm)); // Vertical part length
+      border-left: 2px solid rgba(var(--w-text-color-rgb), 1);
+      border-bottom: 2px solid rgba(var(--w-text-color-rgb), 1);
+      border-bottom-left-radius: var(--w-border-radius-lg);
+      z-index: 1;
+
+      @include breakpoint(mobile) {
+        left: calc((var(--avatar-size-1-mobile) / 2) - 1px);
+        width: calc(var(--avatar-size-1-mobile) / 2 + var(--w-spacing-sm));
+        height: calc(var(--avatar-size-2-mobile) / 2 + var(--w-spacing-sm));
+      }
+    }
+  }
+
+  &__load-more {
+    @include flex(row, flex-start, center);
+    padding-left: var(--w-spacing-md); // Align with comment content
+    margin-top: var(--w-spacing-sm);
+
+    .load-more-btn {
+      @include button-style(transparent, var(--w-text-color-light));
+      padding: var(--w-spacing-xs) var(--w-spacing-sm);
+      font-size: var(--w-font-size-sm);
+
+      &:hover {
+        color: var(--w-primary-color);
+        background-color: rgba(var(--w-primary-color-rgb), 0.1);
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Comment Item
+// ==========================================================================
+.comment-item {
+  transition: var(--w-transition-ease);
+  position: relative;
+
+ 
+  &__layout {
+    @include flex(row, flex-start, flex-start);
+    gap: var(--w-spacing-md);
+
+    @include breakpoint(mobile) {
+      gap: var(--w-spacing-sm);
+    }
+  }
+
+  &__avatar {
+    flex-shrink: 0;
+    position: relative; // For curved line pseudo-element
+    z-index: 2; // Ensure avatar is above curved line
+
+    img {
+      border-radius: var(--w-border-radius-circle);
+      object-fit: cover;
+      @include shadow(sm);
+      transition: width 0.3s ease, height 0.3s ease;
+    }
+
+    // Avatar sizing based on depth
+    &[data-depth="0"] img {
+      width: var(--avatar-size-0);
+      height: var(--avatar-size-0);
+
+      @include breakpoint(mobile) {
+        width: var(--avatar-size-0-mobile);
+        height: var(--avatar-size-0-mobile);
+      }
+    }
+
+    &[data-depth="1"] img {
+      width: var(--avatar-size-1);
+      height: var(--avatar-size-1);
+
+      @include breakpoint(mobile) {
+        width: var(--avatar-size-1-mobile);
+        height: var(--avatar-size-1-mobile);
+      }
+    }
+
+    &[data-depth="2"] img {
+      width: var(--avatar-size-2);
+      height: var(--avatar-size-2);
+
+      @include breakpoint(mobile) {
+        width: var(--avatar-size-2-mobile);
+        height: var(--avatar-size-2-mobile);
+      }
+    }
+  }
+
+  &__content {
+    flex-grow: 1;
+    min-width: 0;
+    padding: var(--w-spacing-sm);
+  }
+
+  &__header {
+    @include flex(row, space-between, center);
+    margin-bottom: var(--w-spacing-xs);
+    flex-wrap: wrap;
+    gap: var(--w-spacing-xs);
+  }
+
+  &__meta {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-sm);
+    font-size: var(--w-font-size-sm);
+    color: var(--w-text-color-light);
+
+    @include breakpoint(mobile) {
+      flex-wrap: wrap;
+      gap: var(--w-spacing-xs);
+    }
+  }
+
+  &__username {
+    font-weight: var(--w-font-weight-semibold);
+    color: var(--w-text-color);
+    font-size: var(--w-font-size-md);
+
+    @include breakpoint(mobile) {
+      font-size: var(--w-font-size-sm);
+    }
+  }
+
+  &__badges {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-xs);
+
+    .badge {
+      display: inline-block;
+      padding: 2px 4px;
+      border-radius: var(--w-border-radius);
+      font-size: var(--w-font-size-xs);
+      font-weight: var(--w-font-weight-medium);
+      color: var(--w-white);
+
+      &--admin {
+        background-color: var(--w-danger-color);
+      }
+
+      &--mod {
+        background-color: var(--w-info-color);
+      }
+
+      &--pinned {
+        color: var(--w-primary-color);
+      }
+
+      &--hidden {
+        background-color: var(--w-secondary-color);
+      }
+
+      &--episode {
+        background-color: var(--w-blue);
+      }
+    }
+  }
+
+  &__timestamp {
+    font-size: var(--w-font-size-sm);
+    color: var(--w-text-color-light);
+    white-space: nowrap;
+
+    @include breakpoint(mobile) {
+      font-size: var(--w-font-size-xs);
+    }
+  }
+
+  &__body {
+    margin-bottom: var(--w-spacing-sm);
+  }
+
+  &__text {
+    font-size: var(--w-font-size-md);
+    line-height: 1.6;
+    color: var(--w-text-color);
+    word-break: break-word;
+    text-align: left;
+
+    p {
+      margin-bottom: 0;
+    }
+
+    @include breakpoint(mobile) {
+      font-size: var(--w-font-size-sm);
+    }
+  }
+
+  &__spoiler {
+    margin-top: var(--w-spacing-sm);
+    position: relative;
+    background-color: rgba(var(--w-text-color-rgb), 0.05);
+    border-radius: var(--w-border-radius);
+    padding: var(--w-spacing-sm);
+    border: 1px dashed var(--w-border-color);
+
+    .spoiler-warning {
+      @include flex(row, space-between, center);
+      font-weight: var(--w-font-weight-semibold);
+      color: var(--w-warning-color);
+      font-size: var(--w-font-size-sm);
+
+      .spoiler-toggle {
+        @include button-style(var(--w-warning-color), var(--w-text-color-inverted));
+        padding: 4px 8px;
+        font-size: var(--w-font-size-xs);
+        border-radius: var(--w-border-radius);
+      }
+    }
+
+    .spoiler-content {
+      margin-top: var(--w-spacing-sm);
+      filter: blur(8px); // Blur effect for spoiler
+      transition: filter 0.3s ease;
+
+      &[data-revealed="true"] {
+        filter: blur(0);
+      }
+    }
+  }
+
+  &__actions {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-md);
+    margin-top: var(--w-spacing-sm);
+    font-size: var(--w-font-size-sm);
+
+    @include breakpoint(mobile) {
+      gap: var(--w-spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    button {
+      @include button-style(transparent, var(--w-text-color-light));
+      padding: var(--w-spacing-xs) var(--w-spacing-sm);
+      font-size: var(--w-font-size-sm);
+      border-radius: var(--w-border-radius);
+      @include flex(row, center, center);
+      gap: var(--w-spacing-xs);
+
+      &:hover {
+        color: var(--w-primary-color);
+        background-color: rgba(var(--w-primary-color-rgb), 0.1);
+      }
+
+      &.is-liked {
+        color: var(--w-danger-color);
+
+        &:hover {
+          background-color: rgba(var(--w-danger-color-rgb), 0.1);
+        }
+      }
+
+      &.is-animating {
+        animation: pulse 0.3s ease-in-out;
+      }
+    }
+
+    .comment-item__more-actions {
+      position: relative;
+
+      .comment-item__more-button {
+        // Inherits button styles
+      }
+
+      .comment-item__more-actions-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: var(--w-background-color-light);
+        border: 1px solid var(--w-border-color);
+        border-radius: var(--w-border-radius);
+        @include shadow(md);
+        min-width: 150px;
+        z-index: var(--w-zindex-dropdown);
+        padding: var(--w-spacing-xs) 0;
+
+        button {
+          width: 100%;
+          text-align: left;
+          padding: var(--w-spacing-sm) var(--w-spacing-md);
+          background-color: transparent;
+          color: var(--w-text-color);
+          border-radius: 0;
+          justify-content: flex-start;
+
+          &:hover {
+            background-color: var(--w-background-color-dark);
+            color: var(--w-text-color);
+          }
+
+          &.is-danger {
+            color: var(--w-danger-color);
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Comment Form
+// ==========================================================================
+.comment-form {
+  background-color: var(--w-background-color-light);
+  border-radius: var(--w-border-radius-lg);
+  padding: var(--w-spacing-md);
+  @include shadow(sm);
+  margin-bottom: var(--w-spacing-lg);
+
+  &__header {
+    @include flex(row, space-between, center);
+    margin-bottom: var(--w-spacing-sm);
+    font-size: var(--w-font-size-lg);
+    font-weight: var(--w-font-weight-semibold);
+    color: var(--w-text-color);
+  }
+
+  &__textarea-wrapper {
+    position: relative;
+    margin-bottom: var(--w-spacing-sm);
+  }
+
+  &__textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: var(--w-spacing-sm);
+    border: 1px solid var(--w-border-color);
+    border-radius: var(--w-border-radius);
+    background-color: var(--w-input-bg);
+    color: var(--w-text-color);
+    font-size: var(--w-font-size-md);
+    resize: vertical;
+    transition: border-color var(--w-transition-ease);
+
+    &:focus {
+      outline: none;
+      border-color: var(--w-primary-color);
+    }
+
+    @include placeholder {
+      color: var(--w-text-color-light);
+    }
+  }
+
+  &__char-counter {
+    position: absolute;
+    bottom: var(--w-spacing-xs);
+    right: var(--w-spacing-sm);
+    font-size: var(--w-font-size-xs);
+    color: var(--w-text-color-light);
+
+    &.is-error {
+      color: var(--w-danger-color);
+    }
+  }
+
+
+  // Emoji picker
+  &__emoji-picker {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: var(--w-spacing-xs);
+    background-color: var(--w-background-color-light);
+    border: 1px solid var(--w-border-color);
+    border-radius: var(--w-border-radius);
+    @include shadow(md);
+    z-index: var(--w-zindex-dropdown);
+    padding: var(--w-spacing-sm);
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 28px);
+      gap: 6px;
+
+      button {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        text-align: center;
+        font-size: 18px;
+        background: transparent;
+        border-radius: var(--w-border-radius);
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--w-background-color-dark);
+        }
+      }
+    }
+  }
+
+  &__controls {
+    @include flex(row, space-between, center);
+    flex-wrap: wrap;
+    gap: var(--w-spacing-sm);
+  }
+
+  &__options {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-md);
+
+    .option-toggle {
+      @include flex(row, center, center);
+      gap: var(--w-spacing-xs);
+      font-size: var(--w-font-size-sm);
+      color: var(--w-text-color-light);
+      cursor: pointer;
+      position: relative;
+
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--w-spacing-xs);
+        font-weight: var(--w-font-weight-normal);
+        color: var(--w-text-color);
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        user-select: none;
+        background-color: transparent;
+        border: none;
+        padding: 0 var(--w-spacing-sm);
+        font-size: var(--w-font-size-md);
+        line-height: 1.5;
+        border-radius: var(--w-border-radius);
+        transition: var(--w-transition-ease);
+      }
+
+      input[type="checkbox"] {
+        margin: 0;
+      }
+
+      &:hover {
+        color: var(--w-text-color);
+      }
+    }
+  }
+
+  &__buttons {
+    @include flex(row, flex-end, center);
+    gap: var(--w-spacing-sm);
+
+    .btn-cancel {
+      @include button-style(var(--w-secondary-color), var(--w-text-color-inverted));
+    }
+
+    .btn-submit {
+      @include button-style(var(--w-primary-color), var(--w-text-color-inverted));
+      font-weight: var(--w-font-weight-bold);
+    }
+  }
+
+  &__error {
+    color: var(--w-danger-color);
+    font-size: var(--w-font-size-sm);
+    margin-top: var(--w-spacing-sm);
+  }
+}
+
+// ==========================================================================
+// Comment Empty State
+// ==========================================================================
+.comment-empty {
+  @include flex(column, center, center);
+  padding: var(--w-spacing-xl);
+  text-align: center;
+  color: var(--w-text-color-light);
+
+  &__icon {
+    font-size: 3rem;
+    margin-bottom: var(--w-spacing-md);
+    color: var(--w-border-color-dark);
+  }
+
+  &__title {
+    font-size: var(--w-font-size-h3);
+    margin-bottom: var(--w-spacing-sm);
+    color: var(--w-text-color);
+  }
+
+  &__description {
+    font-size: var(--w-font-size-md);
+    max-width: 400px;
+    line-height: 1.6;
+  }
+}
+
+// ==========================================================================
+// Comment Error State
+// ==========================================================================
+.comment-error {
+  @include flex(column, center, center);
+  padding: var(--w-spacing-xl);
+  text-align: center;
+  color: var(--w-danger-color);
+
+  &__title {
+    @include flex(row, center, center);
+    gap: var(--w-spacing-sm);
+    font-size: var(--w-font-size-h3);
+    margin-bottom: var(--w-spacing-sm);
+
+    .fas {
+      color: var(--w-danger-color);
+    }
+  }
+
+  &__message {
+    font-size: var(--w-font-size-md);
+    margin-bottom: var(--w-spacing-md);
+    max-width: 500px;
+    line-height: 1.6;
+  }
+
+  &__retry {
+    @include button-style(var(--w-danger-color), var(--w-text-color-inverted));
+    @include flex(row, center, center);
+    gap: var(--w-spacing-xs);
+    font-weight: var(--w-font-weight-semibold);
+
+    &:hover {
+      //   background-color: darken(var(--w-danger-color), 10%);
+    }
+  }
+}
+
+// ==========================================================================
+// Comment Skeleton
+// ==========================================================================
+.comment-list__skeleton {
+  @include flex(row, flex-start, flex-start);
+  gap: var(--w-spacing-md);
+
+  .comment-skeleton__avatar {
+    width: var(--avatar-size-0);
+    height: var(--avatar-size-0);
+    border-radius: var(--w-border-radius-circle);
+    background-color: var(--w-border-color);
+    animation: pulse-bg 1.5s infinite ease-in-out;
+
+    @include breakpoint(mobile) {
+      width: var(--avatar-size-0-mobile);
+      height: var(--avatar-size-0-mobile);
+    }
+  }
+
+  .comment-skeleton__content {
+    flex-grow: 1;
+    @include flex(column, flex-start, stretch);
+    gap: var(--w-spacing-sm);
+  }
+
+  .comment-skeleton__header {
+    width: 70%;
+    height: 18px;
+    background-color: var(--w-border-color);
+    border-radius: var(--w-border-radius);
+    animation: pulse-bg 1.5s infinite ease-in-out;
+  }
+
+  .comment-skeleton__text {
+    width: 100%;
+    height: 40px;
+    background-color: var(--w-border-color);
+    border-radius: var(--w-border-radius);
+    animation: pulse-bg 1.5s infinite ease-in-out;
+  }
+
+  .comment-skeleton__actions {
+    width: 50%;
+    height: 20px;
+    background-color: var(--w-border-color);
+    border-radius: var(--w-border-radius);
+    animation: pulse-bg 1.5s infinite ease-in-out;
+  }
+}
+
+// ==========================================================================
+// Mention System
+// ==========================================================================
+
+.user-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+// Styles for the rendered mention link in a comment
+.mention-link {
+  color: var(--w-primary-color);
+  font-weight: var(--w-font-weight-semibold);
+  cursor: pointer;
+  border-radius: var(--w-border-radius);
+  padding: 2px 4px;
+  transition: var(--w-transition-ease);
+
+  &:hover {
+    text-decoration: none;
+    background-color: rgba(var(--w-primary-color-rgb), 0.15);
+    color: var(--w-primary-color-hover);
+  }
+}
+
+// Container for the suggestion box in the comment form
+.comment-form__mention-container {
+  position: absolute;
+  bottom: 100%; // Display above the textarea
+  left: 0;
+  width: 100%;
+  padding-bottom: var(--w-spacing-xs); // Gap from textarea
+  z-index: var(--w-zindex-dropdown);
+}
+
+// Styles for the suggestion box itself
+.mention-suggestion {
+  list-style: none;
+  padding: var(--w-spacing-xs) 0;
+  margin: 0;
+  background-color: var(--w-background-color-light);
+  border: 1px solid var(--w-border-color);
+  border-radius: var(--w-border-radius);
+  @include shadow(md);
+  max-height: 250px;
+  overflow-y: auto;
+
+  // Responsive width
+  width: 280px;
+  @include breakpoint(tablet) {
+    width: 220px;
+  }
+  @include breakpoint(mobile) {
+    width: 100%;
+  }
+
+  &.is-empty {
+    padding: var(--w-spacing-md);
+    text-align: center;
+    color: var(--w-text-color-light);
+    .mention-suggestion__empty-icon {
+      font-size: 1.5rem;
+      margin-bottom: var(--w-spacing-xs);
+    }
+  }
+
+  &__item {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-sm);
+    padding: var(--w-spacing-sm) var(--w-spacing-md);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &.is-active,
+    &:hover {
+      background-color: var(--w-background-color-dark);
+    }
+
+    &.is-loading {
+      .skeleton {
+        animation: pulse-bg 1.5s infinite ease-in-out;
+        background-color: var(--w-border-color);
+        border-radius: var(--w-border-radius);
+      }
+      .mention-suggestion__avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+      }
+      .mention-suggestion__username {
+        width: 120px;
+        height: 16px;
+      }
+    }
+  }
+
+  &__avatar {
+    flex-shrink: 0;
+  }
+
+  &__username {
+    font-size: var(--w-font-size-sm);
+    font-weight: var(--w-font-weight-medium);
+    color: var(--w-text-color);
+    @include text-truncate(1);
+  }
+}
+
+// Styles for the user info tooltip on hover
+.mention-tooltip {
+  background-color: var(--w-background-color-light);
+  border-radius: var(--w-border-radius-lg);
+  border: 1px solid var(--w-border-color);
+  @include shadow(lg);
+  padding: var(--w-spacing-sm);
+  z-index: var(--w-zindex-tooltip);
+  min-width: 180px;
+  text-align: center;
+
+  &__header {
+    margin-bottom: var(--w-spacing-xs);
+    .user-avatar {
+      border: 2px solid var(--w-white);
+    }
+  }
+
+  &__body {
+    @include flex(row, center, center);
+    gap: var(--w-spacing-xs);
+  }
+
+  &__username {
+    font-weight: var(--w-font-weight-bold);
+    font-size: var(--w-font-size-md);
+    color: var(--w-text-color);
+  }
+
+  &__gender-icon {
+    font-size: var(--w-font-size-sm);
+    &.male { color: var(--w-info-color); }
+    &.female { color: var(--w-pink); }
+    &.other { color: var(--w-secondary-color); }
+  }
+}
+
+
+// ==========================================================================
+// Animations
+// ==========================================================================
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-bg {
+  0% {
+    background-color: var(--w-border-color);
+  }
+
+  50% {
+    background-color: var(--w-border-color-dark);
+  }
+
+  100% {
+    background-color: var(--w-border-color);
+  }
+}
+
+// ==========================================================================
+// Variables for avatar sizes and depth
+// ==========================================================================
+:root {
+  // Desktop avatar sizes
+  --avatar-size-0: 48px; // Root comment
+  --avatar-size-1: 40px; // Reply level 1
+  --avatar-size-2: 32px; // Reply level 2
+
+  // Mobile avatar sizes
+  --avatar-size-0-mobile: 36px;
+  --avatar-size-1-mobile: 32px;
+  --avatar-size-2-mobile: 28px;
+}

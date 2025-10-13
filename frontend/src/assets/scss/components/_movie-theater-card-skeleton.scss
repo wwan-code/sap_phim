@@ -1,0 +1,100 @@
+@use '../_variables' as *;
+@use '../_mixins' as *;
+
+.movie-theater-card-skeleton {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+
+  &__banner-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    border-radius: var(--w-border-radius-lg);
+    overflow: hidden;
+    margin-bottom: var(--w-spacing-md);
+    background-color: var(--w-background-color-dark);
+  }
+
+  &__tags {
+    position: absolute;
+    top: var(--w-spacing-sm);
+    right: var(--w-spacing-sm);
+    @include flex(row, flex-end, center);
+    gap: var(--w-spacing-xs);
+  }
+
+  &__tag {
+    width: 40px;
+    height: 20px;
+    border-radius: var(--w-border-radius);
+    background-color: var(--w-background-color-light);
+  }
+
+  &__info {
+    @include flex(row, flex-start, flex-start);
+    gap: var(--w-spacing-md);
+    position: relative;
+    padding: 1rem 1.25rem;
+    z-index: 2;
+  }
+
+  &__poster {
+    width: 80px;
+    flex-shrink: 0;
+    margin-top: calc(-1 * var(--w-spacing-xxl));
+    border-radius: var(--w-border-radius);
+    background-color: var(--w-background-color-dark);
+  }
+
+  &__details {
+    flex-grow: 1;
+    @include flex(column, flex-start, flex-start);
+  }
+
+  &__title {
+    width: 80%;
+    height: var(--w-font-size-lg);
+    background-color: var(--w-background-color-dark);
+    margin-bottom: var(--w-spacing-xs);
+    border-radius: var(--w-border-radius);
+  }
+
+  &__original-title {
+    width: 60%;
+    height: var(--w-font-size-sm);
+    background-color: var(--w-background-color-dark);
+    margin-bottom: var(--w-spacing-sm);
+    border-radius: var(--w-border-radius);
+  }
+
+  &__metadata {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-xs);
+    width: 70%;
+  }
+
+  &__metadata-item {
+    width: 40px;
+    height: var(--w-font-size-xs);
+    background-color: var(--w-background-color-dark);
+    border-radius: var(--w-border-radius);
+  }
+}
+
+/* Shimmer effect */
+.shimmer {
+  background: linear-gradient(to right, var(--w-background-color-dark) 8%, #333 18%, var(--w-background-color-dark) 33%);
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}

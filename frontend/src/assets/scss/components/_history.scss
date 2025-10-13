@@ -1,0 +1,228 @@
+@use '../mixins' as *;
+
+.history-tab {
+  animation: fade-in 300ms ease;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--w-spacing-lg);
+
+    h3 {
+      font-size: 24px;
+      color: var(--w-text-color);
+      margin: 0;
+    }
+
+    .btn--danger {
+      background-color: var(--w-danger-color);
+      color: var(--w-text-color-light);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+
+      &:hover:not(:disabled) {
+        background-color: rgba(var(--w-danger-color-rgb), .8);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+.history-timeline-container {
+  max-height: 70vh; /* Adjust as needed for scrollable area */
+  overflow-y: auto;
+  padding-right: 10px; /* For scrollbar */
+}
+
+.history-day-group {
+  margin-bottom: var(--w-spacing-lg);
+
+  &__date {
+    font-size: 18px;
+    color: var(--w-primary-color);
+    margin-bottom: var(--w-spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+  }
+
+  &__items {
+    display: grid;
+    gap: var(--w-spacing-md);
+  }
+}
+
+.history-item {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--w-box-shadow-md);
+  }
+
+  &__poster {
+    position: relative;
+    width: 120px; /* Fixed width for poster */
+    flex-shrink: 0;
+    padding-top: 180px; /* Aspect ratio 2:3 (120px width, 180px height) */
+    overflow: hidden;
+
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+
+      svg {
+        font-size: 30px;
+        color: var(--w-text-color-light);
+      }
+    }
+
+    &:hover .play-overlay {
+      opacity: 1;
+    }
+  }
+
+  &__content {
+    flex-grow: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  &__top {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--w-text-color);
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      &:hover {
+        color: var(--w-primary-color);
+      }
+    }
+  }
+
+  &__episode {
+    font-size: 13px;
+    color: var(--w-text-color-light);
+  }
+
+  &__progress {
+    margin-top: 10px;
+    .progress-bar {
+      background-color: rgba(255, 255, 255, 0.1);
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background-color: var(--w-primary-color);
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 12px;
+      color: var(--w-text-color-light);
+      margin-top: 5px;
+      display: block;
+    }
+  }
+
+  &__bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+  }
+
+  &__time {
+    font-size: 13px;
+    color: var(--w-text-color-light);
+  }
+
+  &__delete {
+    background: transparent;
+    border: none;
+    color: var(--w-text-color-light);
+    opacity: 0.7;
+    transition: var(--w-transition-ease);
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+      color: var(--w-danger-color);
+    }
+  }
+}
+
+.history-loading-skeleton,
+.history-loading-more {
+  display: grid;
+  gap: var(--w-spacing-md);
+  margin-top: var(--w-spacing-md);
+}
+
+.history-empty {
+  text-align: center;
+  opacity: 0.8;
+  padding: var(--w-spacing-md);
+  color: var(--w-text-color-light);
+}
+
+.ai-recommendation-placeholder {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: var(--w-spacing-lg);
+  margin-top: var(--w-spacing-lg);
+  text-align: center;
+  color: var(--w-text-color-light);
+
+  h4 {
+    color: var(--w-primary-color);
+    margin-bottom: var(--w-spacing-sm);
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}

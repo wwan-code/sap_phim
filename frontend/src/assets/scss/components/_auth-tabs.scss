@@ -1,0 +1,35 @@
+// _auth-tabs.scss
+@use '../mixins' as *;
+
+.auth-tabs {
+  margin-bottom: var(--w-spacing-lg);
+
+  &__header {
+    @include flex(row, stretch, center);
+    border-bottom: 1px solid var(--w-border-color);
+  }
+
+  &__tab-button {
+    flex: 1;
+    padding: var(--w-spacing-sm) var(--w-spacing-md);
+    font-size: var(--w-font-size-md);
+    font-weight: var(--w-font-weight-medium);
+    color: var(--w-text-color-light);
+    transition: var(--w-transition-ease);
+    background-color: transparent;
+    outline: none;
+    border: 2px solid transparent;
+    text-align: center;
+
+    &:hover {
+      color: var(--w-text-color);
+    }
+
+    &.active {
+      color: var(--w-text-color-inverted);
+      box-shadow: var(--w-box-shadow);
+      font-weight: var(--w-font-weight-bold);
+      border-bottom: 2px solid var(--w-primary-color);
+    }
+  }
+}

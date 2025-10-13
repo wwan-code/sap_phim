@@ -1,0 +1,114 @@
+// _mixins.scss
+
+// Mixin cho responsive breakpoints
+@mixin breakpoint($point) {
+  @if $point == xs {
+    @media (max-width: 575.98px) { @content; }
+  } @else if $point == sm {
+    @media (min-width: 576px) and (max-width: 767.98px) { @content; }
+  } @else if $point == md {
+    @media (min-width: 768px) and (max-width: 991.98px) { @content; }
+  } @else if $point == lg {
+    @media (min-width: 992px) and (max-width: 1199.98px) { @content; }
+  } @else if $point == xl {
+    @media (min-width: 1200px) { @content; }
+  } @else if $point == mobile {
+    @media (max-width: 767.98px) { @content; }
+  } @else if $point == tablet {
+    @media (min-width: 768px) and (max-width: 991.98px) { @content; }
+  } @else if $point == desktop {
+    @media (min-width: 992px) { @content; }
+  } @else if $point == tablet-and-below {
+    @media (max-width: 991.98px) { @content; }
+  } @else if $point == desktop-and-above {
+    @media (min-width: 992px) { @content; }
+  }
+}
+
+// Mixin cho flexbox
+@mixin flex($direction: row, $justify: flex-start, $align: stretch) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+}
+
+// Mixin cho button styles
+@mixin button-style($bg-color, $text-color: var(--w-text-color-inverted)) {
+  background-color: $bg-color;
+  color: $text-color;
+  padding: var(--w-spacing-sm) var(--w-spacing-md);
+  border-radius: var(--w-border-radius);
+  cursor: pointer;
+  transition: var(--w-transition-ease);
+  border: 1px solid $bg-color; // Add border for consistency
+
+  &:hover {
+    filter: brightness(0.9);
+  }
+
+  &:active {
+    filter: brightness(0.8);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Mixin cho text truncation (ellipsis)
+@mixin text-truncate($lines: 1) {
+  @if $lines == 1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  } @else {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+  }
+}
+
+// Mixin cho shadow
+@mixin shadow($level: md) {
+  @if $level == sm {
+    box-shadow: var(--w-box-shadow);
+  } @else if $level == md {
+    box-shadow: var(--w-box-shadow-lg);
+  } @else if $level == none {
+    box-shadow: none;
+  }
+}
+
+// Mixin cho placeholder text
+@mixin placeholder {
+  &::-webkit-input-placeholder { @content; }
+  &:-moz-placeholder { @content; }
+  &::-moz-placeholder { @content; }
+  &:-ms-input-placeholder { @content; }
+}
+
+// Mixin cho card-like elements
+@mixin card-style($padding: var(--w-spacing-md), $border-radius: var(--w-border-radius-lg), $shadow: md) {
+  background-color: var(--w-background-color);
+  padding: $padding;
+  border-radius: $border-radius;
+  @include shadow($shadow);
+}
+
+// Mixin cho transition ease
+@mixin transition-ease($duration: 0.3s, $property: all) {
+  transition: $property $duration ease-in-out;
+}
+
+// Keyframes cho skeleton loading animation
+@keyframes pulse-bg {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

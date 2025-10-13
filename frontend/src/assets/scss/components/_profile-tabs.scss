@@ -1,0 +1,64 @@
+@use '../mixins' as *;
+
+.profile-tabs {
+  margin-bottom: var(--w-spacing-lg);
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    @include flex(row, flex-start, center);
+    border-bottom: 2px solid var(--w-border-color);
+    gap: var(--w-spacing-sm);
+  }
+
+  &__item {
+    padding: var(--w-spacing-sm) var(--w-spacing-md);
+    cursor: pointer;
+    position: relative;
+    @include flex(row, center, center);
+    gap: var(--w-spacing-sm);
+    color: var(--w-text-color-light);
+    font-weight: var(--w-font-weight-medium);
+    transition: color 0.3s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--w-primary-color);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      color: var(--w-text-color);
+    }
+
+    &.is-active {
+      color: var(--w-primary-color);
+
+      &::after {
+        transform: scaleX(1);
+      }
+    }
+  }
+
+  &__icon {
+    font-size: var(--w-font-size-lg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__label {
+    font-size: var(--w-font-size-md);
+
+    @include breakpoint(mobile) {
+      display: none; // Hide label on mobile, only show icon
+    }
+  }
+}

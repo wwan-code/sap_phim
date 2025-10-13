@@ -1,0 +1,178 @@
+@use '../../mixins' as *;
+
+.search-bar {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+
+    &__input-wrapper {
+        position: relative;
+        @include flex(row, stretch, center);
+    }
+
+    &__input {
+        width: 100%;
+        padding: var(--w-spacing-sm) var(--w-spacing-xl) var(--w-spacing-sm) var(--w-spacing-md);
+        background-color: rgba(var(--w-input-bg-rgb), .85);
+        border: none;
+        border-radius: var(--w-border-radius-lg);
+        color: var(--w-text-color);
+        font-size: var(--w-font-size-sm);
+        transition: var(--w-transition-ease);
+
+        &:focus {
+            outline: none;
+        }
+
+        @include placeholder {
+            color: var(--w-text-color-light);
+        }
+    }
+
+    &__button {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        padding: 0 var(--w-spacing-sm);
+        background: transparent;
+        border: none;
+        color: var(--w-text-color-light);
+        cursor: pointer;
+        font-size: var(--w-font-size-sm);
+
+        &:hover {
+            color: var(--w-primary-color);
+        }
+    }
+
+    &__spinner {
+        position: absolute;
+        right: 40px; // Vị trí bên trái nút search
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--w-primary-color);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+}
+
+.search-results {
+    position: absolute;
+    top: calc(100% + var(--w-spacing-sm));
+    left: 0;
+    width: 100%;
+    background-color: rgba(var(--w-input-bg-rgb), 0.85);
+    border-radius: var(--w-border-radius);
+    box-shadow: var(--w-box-shadow-lg);
+    z-index: var(--w-zindex-dropdown);
+    max-height: 400px;
+    overflow-y: auto;
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+    animation: fadeInResults 0.2s ease-out forwards;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+        background-color: var(--w-background-color);
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: var(--w-background-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--w-primary-color);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--w-primary-color-hover);
+      }
+
+    &__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__item {
+        @include flex(row, flex-start, stretch);
+        padding: var(--w-spacing-xs) var(--w-spacing-sm);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            background-color: var(--w-background-color-light);
+        }
+
+        &-poster {
+            width: 50px;
+            height: 75px;
+            object-fit: inherit;
+            border-radius: var(--w-border-radius);
+            margin-right: var(--w-spacing-sm);
+            flex-shrink: 0;
+        }
+
+        &-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        &-title {
+            font-size: var(--w-font-size-sm);
+            font-weight: var(--w-font-weight-medium);
+            color: var(--w-text-color);
+            margin: 0 0 var(--w-spacing-xs) 0;
+            @include text-truncate(2);
+
+            mark {
+                background-color: var(--w-primary-color);
+                color: var(--w-text-color-inverted);
+                padding: 0 2px;
+                border-radius: 2px;
+            }
+        }
+
+        &-meta {
+            font-size: var(--w-font-size-xs);
+            color: var(--w-text-color-light);
+            margin: 0;
+        }
+    }
+
+    &__message {
+        padding: var(--w-spacing-lg) var(--w-spacing-md);
+        text-align: center;
+        color: var(--w-text-color-light);
+
+        &--error {
+            color: var(--w-danger-color);
+        }
+    }
+
+    &__load-more {
+        padding: var(--w-spacing-md);
+        text-align: center;
+        color: var(--w-text-color-light);
+        font-size: var(--w-font-size-sm);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: translateY(-50%) rotate(360deg);
+    }
+}
+
+@keyframes fadeInResults {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+    }
+}

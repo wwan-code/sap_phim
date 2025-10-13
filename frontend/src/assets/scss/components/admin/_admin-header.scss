@@ -1,0 +1,185 @@
+// _admin-header.scss
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.admin-header {
+  height: var(--w-header-height-desktop);
+  background-color: var(--w-sidebar-bg);
+  border-bottom: var(--w-border-width) var(--w-border-style) var(--w-border-color);
+  padding: 0 var(--w-spacing-lg);
+  @include flex(row, space-between, center);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: var(--w-zindex-sticky);
+  @include shadow(sm);
+
+  @include breakpoint(tablet-and-below) {
+    height: var(--w-header-height-mobile);
+    padding: 0 var(--w-spacing-md);
+  }
+
+  &__left {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-md);
+  }
+
+  &__hamburger-btn {
+    background: none;
+    border: none;
+    font-size: var(--w-font-size-xl);
+    color: var(--w-text-color-light);
+    cursor: pointer;
+    padding: var(--w-spacing-xs);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--w-text-color);
+    }
+
+    @include breakpoint(desktop-and-above) {
+      display: none;
+    }
+  }
+
+  &__right {
+    @include flex(row, flex-end, center);
+    gap: var(--w-spacing-lg);
+  }
+
+  &__icon-btn {
+    background: none;
+    border: none;
+    font-size: var(--w-font-size-xl);
+    color: var(--w-text-color-light);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--w-text-color);
+    }
+
+    .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--w-danger-color);
+      color: var(--w-text-color-inverted);
+      font-size: var(--w-font-size-xs);
+      padding: 2px 6px;
+      border-radius: var(--w-border-radius-circle);
+    }
+  }
+
+  &__user-menu {
+    position: relative;
+  }
+
+  &__avatar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--w-border-radius-circle);
+    object-fit: cover;
+    border: 2px solid var(--w-border-color);
+  }
+
+  &__dropdown-menu {
+    position: absolute;
+    top: calc(100% + var(--w-spacing-sm));
+    right: 0;
+    background-color: var(--w-background-color);
+    border: var(--w-border-width) var(--w-border-style) var(--w-border-color);
+    border-radius: var(--w-border-radius-lg);
+    box-shadow: var(--w-box-shadow-lg);
+    min-width: 220px;
+    z-index: var(--w-zindex-dropdown);
+    padding: var(--w-spacing-sm) 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+
+    &.is-open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-header {
+      padding: var(--w-spacing-md);
+      border-bottom: var(--w-border-width) var(--w-border-style) var(--w-border-color);
+      margin-bottom: var(--w-spacing-sm);
+      @include flex(row, flex-start, center);
+      gap: var(--w-spacing-sm);
+
+      &__avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--w-border-radius-circle);
+      }
+
+      &__info {
+        @include flex(column, flex-start, flex-start);
+      }
+
+      &__name {
+        font-weight: var(--w-font-weight-bold);
+        color: var(--w-text-color);
+        margin: 0;
+      }
+      &__email {
+        font-size: var(--w-font-size-sm);
+        color: var(--w-text-color-light);
+        margin: 0;
+      }
+    }
+
+    .dropdown-item {
+      @include flex(row, flex-start, center);
+      gap: var(--w-spacing-sm);
+      padding: var(--w-spacing-sm) var(--w-spacing-md);
+      color: var(--w-text-color);
+      text-decoration: none;
+      transition: var(--w-transition-ease);
+
+      &:hover {
+        background-color: var(--w-background-color-light);
+      }
+
+      .icon {
+        font-size: var(--w-font-size-lg);
+        color: var(--w-text-color-light);
+      }
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: var(--w-border-color);
+      margin: var(--w-spacing-sm) 0;
+    }
+
+    .dropdown-button {
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+  }
+}

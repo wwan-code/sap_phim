@@ -1,0 +1,97 @@
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.footer {
+  background-color: var(--w-footer-bg);
+  color: var(--w-text-color-inverted);
+  padding: var(--w-spacing-xl);
+  text-align: center;
+  font-size: var(--w-font-size-sm);
+  border-top: 1px solid var(--w-border-color-dark);
+
+  @include breakpoint(mobile) {
+    padding: var(--w-spacing-lg);
+  }
+
+  &__content {
+    @include flex(row, space-around, flex-start);
+    flex-wrap: wrap;
+    max-width: var(--w-max-width);
+    margin: 0 auto var(--w-spacing-xl) auto;
+    gap: var(--w-spacing-lg);
+
+    @include breakpoint(mobile) {
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: var(--w-spacing-lg);
+    }
+  }
+
+  &__section {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: var(--w-spacing-md);
+    text-align: left;
+
+    @include breakpoint(mobile) {
+      text-align: center;
+      min-width: unset;
+      width: 100%;
+    }
+
+    h4 {
+      color: var(--w-primary-color);
+      margin-bottom: var(--w-spacing-md);
+      font-size: var(--w-font-size-md);
+    }
+
+    p {
+      margin-bottom: var(--w-spacing-xs);
+      line-height: 1.5;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: var(--w-spacing-xs);
+
+        a {
+          color: var(--w-text-color-light);
+          text-decoration: none;
+          transition: var(--w-transition-ease);
+
+          &:hover {
+            color: var(--w-primary-color);
+          }
+        }
+      }
+    }
+  }
+
+  &__social-links {
+    @include flex(row, center, center);
+    gap: var(--w-spacing-md);
+    margin-top: var(--w-spacing-lg);
+    width: 100%; // Đảm bảo chiếm hết chiều rộng để căn giữa
+
+    a {
+      color: var(--w-text-color-inverted);
+      font-size: var(--w-font-size-xl);
+      transition: var(--w-transition-ease);
+
+      &:hover {
+        color: var(--w-primary-color);
+      }
+    }
+  }
+
+  &__copyright {
+    margin-top: var(--w-spacing-lg);
+    color: var(--w-text-color-light);
+    border-top: 1px solid rgba(var(--w-text-color-inverted-rgb), 0.1);
+    padding-top: var(--w-spacing-md);
+  }
+}

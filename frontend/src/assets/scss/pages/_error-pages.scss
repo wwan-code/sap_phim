@@ -1,0 +1,46 @@
+// _error-pages.scss
+@use '../mixins' as *;
+.error-page {
+  @include flex(row, center, center);
+  min-height: 100vh;
+  background-color: var(--w-background-color-light);
+  padding: var(--w-spacing-lg);
+  text-align: center;
+
+  &__container {
+    background-color: var(--w-card-background);
+    border-radius: var(--w-border-radius-lg);
+    box-shadow: var(--w-box-shadow-lg);
+    padding: var(--w-spacing-xl);
+    width: 100%;
+    max-width: 600px;
+    transition: var(--w-transition-ease);
+
+    @include breakpoint(mobile) {
+      padding: var(--w-spacing-lg);
+    }
+  }
+
+  &__title {
+    font-size: 6rem;
+    color: var(--w-primary-color);
+    margin-bottom: var(--w-spacing-md);
+
+    @include breakpoint(mobile) {
+      font-size: 4rem;
+    }
+  }
+
+  &__message {
+    font-size: var(--w-font-size-lg);
+    color: var(--w-text-color);
+    margin-bottom: var(--w-spacing-xl);
+  }
+
+  &__home-link {
+    @include button-style(var(--w-primary-color));
+    padding: var(--w-spacing-md) var(--w-spacing-xl);
+    font-size: var(--w-font-size-base);
+    border-radius: var(--w-border-radius-pill);
+  }
+}

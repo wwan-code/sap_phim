@@ -1,0 +1,48 @@
+@use '../../mixins' as *;
+
+.friends-tab {
+  background-color: var(--w-background-color);
+  border-radius: var(--w-border-radius-lg);
+  @include shadow(sm);
+  overflow: hidden; // Ensure content respects border-radius
+
+  &__header {
+    border-bottom: 1px solid var(--w-border-color);
+    background-color: var(--w-background-color-light);
+  }
+
+  &__nav {
+    @include flex(row, flex-start, center);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__nav-item {
+    padding: var(--w-spacing-md) var(--w-spacing-lg);
+    cursor: pointer;
+    font-size: var(--w-font-size-md);
+    font-weight: var(--w-font-weight-medium);
+    color: var(--w-text-color-light);
+    transition: var(--w-transition-ease);
+    border-bottom: 2px solid transparent; // For active indicator
+
+    &:hover {
+      color: var(--w-primary-color);
+    }
+
+    &.is-active {
+      color: var(--w-primary-color);
+      border-bottom-color: var(--w-primary-color);
+    }
+
+    @include breakpoint(mobile) {
+      padding: var(--w-spacing-sm) var(--w-spacing-md);
+      font-size: var(--w-font-size-sm);
+    }
+  }
+
+  &__content {
+    background-color: var(--w-background-color-light);
+  }
+}

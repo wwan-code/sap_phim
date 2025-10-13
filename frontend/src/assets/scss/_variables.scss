@@ -1,0 +1,156 @@
+// _variables.scss
+
+// Default (Light) Theme Variables
+:root,
+[data-ww-theme="light"] {
+  // Colors
+  --w-blue: #0d6efd;
+  --w-indigo: #6610f2;
+  --w-purple: #6f42c1;
+  --w-pink: #d63384;
+  --w-red: #dc3545;
+  --w-orange: #fd7e14;
+  --w-yellow: #ffc107;
+  --w-green: #198754;
+  --w-teal: #20c997;
+  --w-cyan: #0dcaf0;
+  --w-black: #000;
+  --w-white: #fff;
+  --w-primary-color: #e8c26e;
+  --w-primary-color-rgb: 232, 194, 110;
+  --w-primary-color-hover: #d4af5a;
+  --w-primary-bg-subtle: #dabd7f;
+  --w-primary-bg-subtle-rgb: 219, 189, 127;
+  --w-secondary-color: #6c757d;
+  --w-secondary-color-rgb: 108, 117, 125;
+  --w-secondary-color-hover: #5a636b;
+  --w-accent-color: #007bff;
+  --w-success-color: #28a745;
+  --w-online-color: #28a745;
+  --w-danger-color: #dc3545;
+  --w-warning-color: #ffc107;
+  --w-info-color: #17a2b8;
+  --w-accent-color-rgb: 0, 123, 255;
+  --w-success-color-rgb: 40, 167, 69;
+  --w-online-color-rgb: 40, 167, 69;
+  --w-danger-color-rgb: 220, 53, 69;
+  --w-warning-color-rgb: 255, 193, 7;
+  --w-info-color-rgb: 23, 162, 184;
+
+  // Backgrounds
+  --w-background-color: #ffffff;
+  --w-background-color-rgb: 255, 255, 255;
+  --w-background-color-light: #f8f9fa;
+  --w-background-color-dark: #e9ecef;
+  --w-header-bg: #f7f7f7;
+  --w-header-bg-rgb: 255, 255, 255;
+  --w-footer-bg: #f7f7f7;
+  --w-sidebar-bg: #f7f7f7;
+  --w-input-bg: #f8f9fa;
+  --w-input-bg-rgb: 248, 249, 250;
+
+  // Text Colors
+  --w-text-color: #212121;
+  --w-text-color-rgb: 33, 33, 33;
+  --w-text-color-light: #6c757d;
+  --w-text-color-inverted: #000000;
+
+  // Borders
+  --w-border-width: 1px;
+  --w-border-style: solid;
+  --w-border-color: #dee2e6;
+  --w-border-color-dark: #adb5bd;
+
+  // Spacing
+  --w-spacing-xs: 4px;
+  --w-spacing-sm: 8px;
+  --w-spacing-md: 16px;
+  --w-spacing-lg: 24px;
+  --w-spacing-xl: 32px;
+  --w-spacing-xxl: 48px;
+
+  // Font Sizes
+  --w-font-size-xs: 0.75rem; // 12px
+  --w-font-size-sm: 0.875rem; // 14px
+  --w-font-size-md: 1rem; // 16px (base)
+  --w-font-size-lg: 1.125rem; // 18px
+  --w-font-size-xl: 1.25rem; // 20px
+  --w-font-size-xxl: 1.5rem; // 24px
+  --w-font-size-h1: 2.5rem; // 40px
+  --w-font-size-h2: 2rem; // 32px
+  --w-font-size-h3: 1.75rem; // 28px
+
+  // Font Weights
+  --w-font-weight-thin: 100;
+  --w-font-weight-lighter: 200;
+  --w-font-weight-light: 300;
+  --w-font-weight-normal: 400;
+  --w-font-weight-medium: 500;
+  --w-font-weight-semibold: 600;
+  --w-font-weight-bold: 700;
+  --w-font-weight-bolder: 800;
+  --w-font-weight-black: 900;
+
+  // Border Radius
+  --w-border-radius: 0.25rem; // 4px
+  --w-border-radius-lg: 0.5rem; // 8px
+  --w-border-radius-xl: 1rem; // 16px
+  --w-border-radius-circle: 50%;
+
+  // Box Shadows
+  --w-box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --w-box-shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+
+  // Transitions
+  --w-transition-ease: all 0.3s ease-in-out;
+
+  // Layout
+  --w-max-width: 1400px;
+  --w-header-height-desktop: 80px;
+  --w-header-height-mobile: 60px;
+  --w-footer-height: 200px;
+  --w-sidebar-width-desktop: 300px;
+  --w-sidebar-width-mobile: 280px;
+
+
+  --w-zindex-dropdown: 1000;
+  --w-zindex-sticky: 1020;
+  --w-zindex-fixed: 1030;
+  --w-zindex-offcanvas-backdrop: 1040;
+  --w-zindex-offcanvas: 1045;
+  --w-zindex-modal-backdrop: 1050;
+  --w-zindex-modal: 1055;
+  --w-zindex-popover: 1070;
+  --w-zindex-tooltip: 1080;
+  --w-zindex-toast: 1090;
+
+  // Font Family
+  --w-font-family-base: 'Arial', sans-serif; // Example, adjust as needed
+}
+
+// Dark Theme Variables
+[data-ww-theme="dark"] {
+  // Backgrounds
+  --w-background-color: #000;
+  --w-background-color-rgb: 0, 0, 0;
+  --w-background-color-light: #2c2c2c;
+  --w-background-color-light-rgb: 44, 44, 44;
+  --w-background-color-dark-rgb: 13, 13, 13;
+  --w-background-color-dark: #0d0d0d;
+  --w-header-bg: #000;
+  --w-header-bg-rgb: 0, 0, 0;
+  --w-footer-bg: #1a1a1a;
+  --w-sidebar-bg: #1a1a1a;
+  --w-input-bg: #1a1a1a;
+  --w-input-bg-rgb: 26, 26, 26;
+
+  // Text Colors
+  --w-text-color: #e0e0e0;
+  --w-text-color-rgb: 224, 224, 224;
+  --w-text-color-light: #a0a0a0;
+  --w-text-color-inverted: #ffffff;
+
+  // Borders
+  --w-border-color: #444444;
+  --w-border-color-dark: #666666;
+}

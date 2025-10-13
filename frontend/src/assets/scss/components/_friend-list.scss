@@ -1,0 +1,27 @@
+@use '../mixins' as *;
+
+.friend-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--w-spacing-md);
+  padding: var(--w-spacing-md);
+
+  @include breakpoint(mobile) {
+    grid-template-columns: 1fr;
+    padding: var(--w-spacing-sm);
+  }
+}
+
+.no-results {
+  text-align: center;
+  color: var(--w-text-color-light);
+  padding: var(--w-spacing-lg);
+  font-size: var(--w-font-size-lg);
+}
+
+.error-message {
+  text-align: center;
+  color: var(--w-danger-color);
+  padding: var(--w-spacing-lg);
+  font-size: var(--w-font-size-lg);
+}

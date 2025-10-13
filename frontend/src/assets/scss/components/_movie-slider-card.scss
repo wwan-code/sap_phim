@@ -1,0 +1,100 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.movie-slider-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--w-border-radius);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+        .movie-slider-card__overlay {
+            opacity: 1;
+        }
+    }
+
+    &__link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        position: relative;
+    }
+
+    &__image-wrapper {
+        position: relative;
+        padding-top: 150%; // Aspect ratio 2:3
+        background-color: var(--w-background-color-dark);
+        border-radius: var(--w-border-radius);
+        overflow: hidden;
+    }
+
+    &__picture,
+    &__image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &__overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3rem;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        color: #fff;
+        @include flex(column, center, center);
+    }
+
+    &__play-button {
+        @include button-style(var(--w-primary-color), var(--w-text-color-inverted));
+        border: none;
+        font-size: var(--w-font-size-lg);
+        @include flex(row, center, center);
+        gap: var(--w-spacing-sm);
+
+        span {
+            font-weight: var(--w-font-weight-bold);
+        }
+    }
+
+    &__content {
+        padding: var(--w-spacing-sm);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background: linear-gradient(180deg, hsla(0, 0%, 100%, 0) 0, rgba(0, 0, 0, .4) 40%, #000 87%);
+    }
+
+    &__title {
+        font-size: var(--w-font-size-sm);
+        font-weight: var(--w-font-weight-bold);
+        color: var(--w-text-color);
+        @include text-truncate(2);
+        margin: 0 0 var(--w-spacing-sm) 0;
+    }
+
+    &__stats {
+        @include flex(row, space-between, center);
+        font-size: var(--w-font-size-sm);
+        color: var(--w-text-color-light);
+    }
+
+    &__stat {
+        @include flex(row, flex-start, center);
+        gap: var(--w-spacing-xs);
+
+        svg {
+            color: var(--w-primary-color);
+        }
+    }
+}

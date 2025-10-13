@@ -1,0 +1,108 @@
+@use '../../mixins' as *;
+
+.settings-tab {
+
+  &__form {
+    .form-group {
+      margin-bottom: var(--w-spacing-md);
+
+      label {
+        display: block;
+        margin-bottom: var(--w-spacing-xs);
+        font-weight: var(--w-font-weight-medium);
+        color: var(--w-text-color);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: var(--w-spacing-sm) var(--w-spacing-md);
+        border: 1px solid var(--w-border-color);
+        border-radius: var(--w-border-radius);
+        background-color: var(--w-input-bg);
+        color: var(--w-text-color);
+        transition: var(--w-transition-ease);
+
+        &:focus {
+          border-color: var(--w-primary-color);
+          box-shadow: 0 0 0 0.2rem rgba(var(--w-primary-color-rgb), 0.25);
+          outline: none;
+        }
+
+        &:disabled {
+          background-color: var(--w-background-color-light);
+          cursor: not-allowed;
+        }
+      }
+      
+      textarea.form-control {
+        resize: vertical;
+      }
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--w-spacing-md);
+
+      @include breakpoint(mobile) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  &__subtitle {
+    font-size: var(--w-font-size-xl);
+    color: var(--w-primary-color);
+    margin-top: var(--w-spacing-xl);
+    margin-bottom: var(--w-spacing-lg);
+    padding-bottom: var(--w-spacing-sm);
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  &__image-upload {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--w-spacing-lg);
+    align-items: flex-start;
+    margin-bottom: var(--w-spacing-xl);
+
+    .image-upload__group {
+      @include flex(column, flex-start, flex-start);
+      gap: var(--w-spacing-sm);
+
+      label {
+        font-weight: var(--w-font-weight-medium);
+      }
+
+      .image-upload__preview {
+        border-radius: var(--w-border-radius);
+        object-fit: cover;
+        border: 2px dashed var(--w-border-color);
+        padding: var(--w-spacing-xs);
+
+        &--avatar {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+        }
+
+        &--cover {
+          width: 100%;
+          height: 150px;
+        }
+      }
+      
+      .btn {
+        margin-right: var(--w-spacing-sm);
+      }
+    }
+  }
+
+  &__submit-btn {
+    @include button-style(var(--w-primary-color));
+    margin-top: var(--w-spacing-xl);
+  }
+}

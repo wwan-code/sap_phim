@@ -1,0 +1,70 @@
+// _form-select.scss
+
+.form-select {
+    --w-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    display: block;
+    width: 100%;
+    padding: var(--w-spacing-sm) var(--w-spacing-lg) var(--w-spacing-sm) var(--w-spacing-sm);
+      border: 1px solid var(--w-border-color);
+      border-radius: var(--w-border-radius);
+      background-color: var(--w-input-bg);
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: var(--w-form-select-bg-img);
+      background-repeat: no-repeat;
+      background-position: right var(--w-spacing-sm) center;
+      background-size: var(--w-spacing-sm);
+      color: var(--w-text-color);
+    border-radius: var(--w-border-radius);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .form-select {
+        transition: none;
+    }
+}
+
+.form-select:focus {
+    border-color: var(--w-primary-color);
+    outline: 0;
+    box-shadow: 0 0 0.25rem 0.125rem rgba(var(--w-primary-color-rgb), 0.4)
+}
+
+.form-select[multiple],
+.form-select[size]:not([size="1"]) {
+    padding-right: 0.75rem;
+    background-image: none
+}
+
+.form-select:disabled {
+    color: var(--w-secondary-color);
+    background-color: rgba(var(--w-base-color-rgb), 0.06);
+    border-color: rgba(var(--w-base-color-rgb), 0.24)
+}
+
+.form-select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 var(--w-body-color);
+}
+
+.form-select-sm {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.5rem;
+    font-size: 0.875rem;
+    border-radius: var(--w-border-radius-sm);
+}
+
+.form-select-lg {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 1rem;
+    font-size: 1.25rem;
+    border-radius: var(--w-border-radius-lg);
+}
+
+[data-ww-theme="dark"] .form-select {
+    --w-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23dee2e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
