@@ -23,6 +23,7 @@ import {
     useAdminDeleteComment,
 } from '@/hooks/useCommentQueries';
 import { toast } from 'react-toastify';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
 
 // Component nội bộ để render mention link và quản lý tooltip
 const MentionLink = ({ href, children }) => {
@@ -193,15 +194,11 @@ const CommentItem = ({
 
     const sanitizedMarkdown = DOMPurify.sanitize(comment.text);
 
-    const avatarUrl = comment.user?.avatarUrl
-        ? `${import.meta.env.VITE_SERVER_URL}${comment.user.avatarUrl}`
-        : `https://ui-avatars.com/api/?name=${comment.user?.username || '?'}&background=random&color=fff`;
-
     return (
         <article className={classNames("comment-item", {"comment-item--nested": comment.hasReplies})} id={comment.id} data-nested={comment.hasReplies} data-depth={depth}>
             <div className="comment-item__layout">
                 <div className="comment-item__avatar" data-depth={depth}>
-                    <img src={avatarUrl} alt={`${comment.user?.username} avatar`} loading="lazy" />
+                    <img src={getAvatarUrl(comment.user)} alt={`${comment.user?.username} avatar`} loading="lazy" />
                 </div>
 
                 <div className="comment-item__content">

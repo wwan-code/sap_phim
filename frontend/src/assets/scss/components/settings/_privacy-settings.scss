@@ -1,0 +1,192 @@
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.privacy-settings {
+  &__header {
+    margin-bottom: var(--w-spacing-xl);
+    padding-bottom: var(--w-spacing-lg);
+    border-bottom: 1px solid var(--w-border-color);
+  }
+
+  &__title {
+    font-size: var(--w-font-size-h3);
+    font-weight: var(--w-font-weight-bold);
+    color: var(--w-text-color);
+    margin-bottom: var(--w-spacing-sm);
+  }
+
+  &__description {
+    font-size: var(--w-font-size-md);
+    color: var(--w-text-color-light);
+  }
+
+  &__content {
+    @include flex(column, flex-start, stretch);
+    gap: var(--w-spacing-xl);
+  }
+
+  &__section {
+    @include transition-ease(0.2s);
+  }
+
+  &__section-header {
+    margin-bottom: var(--w-spacing-md);
+  }
+
+  &__section-title {
+    font-size: var(--w-font-size-lg);
+    font-weight: var(--w-font-weight-semibold);
+    color: var(--w-text-color);
+    margin-bottom: var(--w-spacing-xs);
+  }
+
+  &__section-description {
+    font-size: var(--w-font-size-sm);
+    color: var(--w-text-color-light);
+  }
+
+  &__options {
+    @include flex(column, flex-start, stretch);
+    gap: var(--w-spacing-sm);
+  }
+
+  &__option {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-md);
+    padding: var(--w-spacing-md);
+    background-color: var(--w-background-color-dark);
+    border-radius: var(--w-border-radius-lg);
+    cursor: pointer;
+    @include transition-ease(0.2s);
+
+    &:hover {
+      background-color: var(--w-background-color);
+    }
+
+    input[type='radio'] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--w-primary-color);
+    }
+  }
+
+  &__option-label {
+    @include flex(column, flex-start, flex-start);
+    flex: 1;
+    gap: var(--w-spacing-xs);
+
+    strong {
+      font-weight: var(--w-font-weight-semibold);
+      color: var(--w-text-color);
+    }
+  }
+
+  &__option-desc {
+    font-size: var(--w-font-size-sm);
+    color: var(--w-text-color-light);
+  }
+
+  &__toggle {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-md);
+  }
+
+  &__toggle-label {
+    font-size: var(--w-font-size-md);
+    font-weight: var(--w-font-weight-medium);
+    color: var(--w-text-color);
+  }
+
+  &__actions {
+    @include flex(row, flex-end, center);
+    gap: var(--w-spacing-md);
+    padding-top: var(--w-spacing-xl);
+    border-top: 1px solid var(--w-border-color);
+    margin-top: var(--w-spacing-xl);
+  }
+
+  &__btn {
+    padding: var(--w-spacing-sm) var(--w-spacing-lg);
+    border-radius: var(--w-border-radius);
+    font-size: var(--w-font-size-md);
+    font-weight: var(--w-font-weight-semibold);
+    cursor: pointer;
+    @include transition-ease(0.2s);
+    border: none;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &--primary {
+      background-color: var(--w-primary-color);
+      color: var(--w-white);
+
+      &:hover:not(:disabled) {
+        background-color: var(--w-primary-color-hover);
+      }
+    }
+
+    &--secondary {
+      background-color: var(--w-background-color-light);
+      color: var(--w-text-color);
+      border: 1px solid var(--w-border-color);
+
+      &:hover:not(:disabled) {
+        background-color: var(--w-background-color-dark);
+      }
+    }
+  }
+}
+
+// Toggle Switch Component
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked + .toggle-switch__slider {
+      background-color: var(--w-primary-color);
+
+      &::before {
+        transform: translateX(24px);
+      }
+    }
+
+    &:focus + .toggle-switch__slider {
+      box-shadow: 0 0 0 3px rgba(var(--w-primary-color-rgb), 0.2);
+    }
+  }
+
+  &__slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--w-border-color);
+    @include transition-ease(0.3s);
+    border-radius: 28px;
+
+    &::before {
+      position: absolute;
+      content: '';
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      @include transition-ease(0.3s);
+      border-radius: 50%;
+    }
+  }
+}

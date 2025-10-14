@@ -23,6 +23,7 @@ router.delete('/:id/admin', verifyToken, authorizeRoles('admin'), commentControl
 
 // Public routes
 router.get('/:parentId/replies', verifyTokenOptional, commentController.getReplies); // GET /api/comments/:parentId/replies
+router.get('/:id/with-parents', verifyTokenOptional, commentController.getCommentWithParents); // GET /api/comments/:id/with-parents
 
 router.get('/:contentType/:contentId', verifyTokenOptional, commentController.getComments); // GET /api/comments/movie/:contentId or /api/comments/episode/:contentId
 router.get('/movie/:movieId/with-episodes', verifyTokenOptional, commentController.getCommentsForMovieWithEpisodes); // GET /api/comments/movie/:movieId/with-episodes

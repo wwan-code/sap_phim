@@ -193,7 +193,7 @@ const storage = multer.diskStorage({
 // Tạo middleware multer với cấu hình nâng cao
 const uploadMovie = multer({
   storage: storage,
-  fileFilter: imageFilter,
+  // fileFilter: imageFilter,
   limits: {
     fileSize: LIMITS.fileSize,
     files: LIMITS.maxFiles,

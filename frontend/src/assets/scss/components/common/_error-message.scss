@@ -1,0 +1,154 @@
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.w-error {
+  display: flex;
+  flex-direction: column;
+  gap: var(--w-spacing-sm);
+  padding: var(--w-spacing-md);
+  border-radius: var(--w-border-radius-md);
+  border: var(--w-border-width) var(--w-border-style) transparent;
+  background-color: var(--w-background-color-light);
+  color: var(--w-text-color);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--w-spacing-sm);
+  }
+
+  &__title {
+    font-weight: var(--w-font-weight-bold);
+    font-size: var(--w-font-size-lg);
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__msg {
+    font-size: var(--w-font-size-md);
+  }
+
+  &__details {
+    font-size: var(--w-font-size-sm);
+    color: var(--w-text-color-light);
+    background-color: var(--w-background-color-dark);
+    padding: var(--w-spacing-sm);
+    border-radius: var(--w-border-radius);
+    white-space: pre-wrap; // Giữ nguyên format code
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  &__actions {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-sm);
+    margin-top: var(--w-spacing-md);
+    flex-wrap: wrap;
+  }
+
+  &__action-btn {
+    @include button-style(transparent);
+    @include focus-visible;
+
+    padding: var(--w-spacing-xs) var(--w-spacing-sm);
+    font-size: var(--w-font-size-sm);
+    border: 1px solid var(--w-border-color);
+    color: var(--w-text-color);
+
+    &--primary {
+      @include button-style(var(--w-primary-color));
+      color: #000;
+      border-color: var(--w-primary-color);
+    }
+
+    &--secondary {
+      @include button-style(var(--w-secondary-color));
+      color: #fff;
+      border-color: var(--w-secondary-color);
+    }
+
+    &--ghost {
+      background: transparent;
+      color: var(--w-text-color-light);
+      border-color: transparent;
+
+      &:hover {
+        background-color: var(--w-background-color-light);
+      }
+    }
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--w-text-color);
+    padding: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+
+    &:hover {
+      color: var(--w-danger-color);
+    }
+  }
+
+  // Variants
+  &--inline {
+    padding: 0;
+    background-color: transparent;
+    color: var(--w-danger-color);
+  }
+
+  &--card {
+    @include card-style;
+  }
+
+  &--banner {
+    width: 100%;
+  }
+
+  &--toast {
+    @include shadow(lg);
+    position: fixed;
+    bottom: var(--w-spacing-lg);
+    right: var(--w-spacing-lg);
+    z-index: var(--w-zindex-toast);
+    min-width: 300px;
+    animation: w-toast-fade-in 0.5s ease-in-out;
+  }
+
+  // Severity levels
+  &--critical {
+    background-color: rgba(var(--w-danger-color-rgb), 0.1);
+    border-color: var(--w-danger-color);
+    color: var(--w-danger-color);
+  }
+
+  &--warning {
+    background-color: rgba(var(--w-warning-color-rgb), 0.1);
+    border-color: var(--w-warning-color);
+    color: var(--w-warning-color);
+  }
+
+  &--info {
+    background-color: rgba(var(--w-info-color-rgb), 0.1);
+    border-color: var(--w-info-color);
+    color: var(--w-info-color);
+  }
+}
+
+@keyframes w-toast-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

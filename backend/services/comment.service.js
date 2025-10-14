@@ -523,12 +523,38 @@ const sendReplyNotification = async ({
         return;
     }
 
+    // Build proper notification link based on content type
+    let notificationLink = '';
+    try {
+        if (contentType === CONTENT_TYPES.MOVIE) {
+            const movie = await Movie.findByPk(contentId, { attributes: ['slug'] });
+            if (movie) {
+                notificationLink = `/movie/${movie.slug}?commentId=${newCommentId}`;
+            }
+        } else if (contentType === CONTENT_TYPES.EPISODE) {
+            const episode = await Episode.findByPk(contentId, {
+                attributes: ['episodeNumber', 'movieId'],
+                include: [{
+                    model: Movie,
+                    as: 'movie',
+                    attributes: ['slug']
+                }]
+            });
+            if (episode && episode.movie) {
+                notificationLink = `/watch/${episode.movie.slug}/episode/${episode.episodeNumber}?commentId=${newCommentId}`;
+            }
+        }
+    } catch (linkError) {
+        console.error('Failed to build notification link:', linkError);
+        // Fallback to basic link
+        notificationLink = `/comments/${contentType}/${contentId}?commentId=${newCommentId}`;
+    }
+
     const preview = commentText.length > 50 ? `${commentText.substring(0, 50)}...` : commentText;
     const { title, body } = generateNotificationContent('new_comment', {
         senderName: sender.username,
         commentPreview: preview,
     });
-    const notificationLink = `/comments/${contentType}/${contentId}?commentId=${newCommentId}`;
 
     await createNotification({
         userId: parentCommentUserId,
@@ -565,12 +591,38 @@ const sendLikeNotification = async ({ commentUserId, currentUserId, comment }) =
         return;
     }
 
+    // Build proper notification link based on content type
+    let notificationLink = '';
+    try {
+        if (comment.contentType === CONTENT_TYPES.MOVIE) {
+            const movie = await Movie.findByPk(comment.contentId, { attributes: ['slug'] });
+            if (movie) {
+                notificationLink = `/movie/${movie.slug}?commentId=${comment.id}`;
+            }
+        } else if (comment.contentType === CONTENT_TYPES.EPISODE) {
+            const episode = await Episode.findByPk(comment.contentId, {
+                attributes: ['episodeNumber', 'movieId'],
+                include: [{
+                    model: Movie,
+                    as: 'movie',
+                    attributes: ['slug']
+                }]
+            });
+            if (episode && episode.movie) {
+                notificationLink = `/watch/${episode.movie.slug}/episode/${episode.episodeNumber}?commentId=${comment.id}`;
+            }
+        }
+    } catch (linkError) {
+        console.error('Failed to build notification link:', linkError);
+        // Fallback to basic link
+        notificationLink = `/comments/${comment.contentType}/${comment.contentId}?commentId=${comment.id}`;
+    }
+
     const preview = comment.text.length > 50 ? `${comment.text.substring(0, 50)}...` : comment.text;
     const { title, body } = generateNotificationContent('like_comment', {
         senderName: sender.username,
         commentPreview: preview,
     });
-    const notificationLink = `/comments/${comment.contentType}/${comment.contentId}?commentId=${comment.id}`;
 
     await createNotification({
         userId: commentUserId,
@@ -699,7 +751,33 @@ const sendMentionNotifications = async ({ commentText, senderId, commentId, cont
 
     const cleanedCommentText = stripMentionLinksForNotification(commentText);
     const preview = cleanedCommentText.length > 50 ? `${cleanedCommentText.substring(0, 50)}...` : cleanedCommentText;
-    const notificationLink = `/comments/${contentType}/${contentId}?commentId=${commentId}`;
+    
+    // Build proper notification link based on content type
+    let notificationLink = '';
+    try {
+        if (contentType === CONTENT_TYPES.MOVIE) {
+            const movie = await Movie.findByPk(contentId, { attributes: ['slug'] });
+            if (movie) {
+                notificationLink = `/movie/${movie.slug}?commentId=${commentId}`;
+            }
+        } else if (contentType === CONTENT_TYPES.EPISODE) {
+            const episode = await Episode.findByPk(contentId, {
+                attributes: ['episodeNumber', 'movieId'],
+                include: [{
+                    model: Movie,
+                    as: 'movie',
+                    attributes: ['slug']
+                }]
+            });
+            if (episode && episode.movie) {
+                notificationLink = `/watch/${episode.movie.slug}/episode/${episode.episodeNumber}?commentId=${commentId}`;
+            }
+        }
+    } catch (linkError) {
+        console.error('Failed to build notification link:', linkError);
+        // Fallback to basic link
+        notificationLink = `/comments/${contentType}/${contentId}?commentId=${commentId}`;
+    }
 
     const notificationPromises = mentionedUsers.map(async (user) => {
         const { title, body } = generateNotificationContent(NOTIFICATION_TYPES.USER_MENTION, {
@@ -736,10 +814,9 @@ const sendMentionNotifications = async ({ commentText, senderId, commentId, cont
 const stripMentions = (text) => {
     if (!text) return '';
     // Regex để tìm các mention có định dạng [@username](/profile/:uuid)
-    // và thay thế chúng bằng một chuỗi rỗng hoặc chỉ giữ lại phần text không phải mention.
-    // Ví dụ: "Hello [@User Name](/profile/uuid) this is a comment." -> "Hello  this is a comment."
-    // Sau đó, có thể cần trim lại khoảng trắng thừa.
-    return text.replace(/\[@([^\]]+)\]\(\/profile\/[a-f0-9-]+\)/g, '').trim();
+    // và thay thế chúng bằng "@username"
+    // Ví dụ: "Hello [@User Name](/profile/uuid) this is a comment." -> "Hello @User Name this is a comment."
+    return text.replace(/\[@([^\]]+)\]\(\/profile\/[a-f0-9-]+\)/g, '@$1').trim();
 };
 
 
@@ -864,212 +941,84 @@ const createComment = async (userId, commentData) => {
  * @throws {Error} Khi loại nội dung không hợp lệ
  */
 const getComments = async (contentType, contentId, query = {}) => {
-    // Validate loại nội dung
-    if (!Object.values(CONTENT_TYPES).includes(contentType)) {
-        throw new Error('Loại nội dung không hợp lệ. Chỉ chấp nhận "movie" hoặc "episode".');
-    }
+    try {
+        // Validate loại nội dung
+        if (!Object.values(CONTENT_TYPES).includes(contentType)) {
+            throw new Error('Loại nội dung không hợp lệ. Chỉ chấp nhận "movie" hoặc "episode".');
+        }
 
-    const { page, limit, sort, userId } = normalizeQueryParams(query);
-    const offset = calculateOffset(page, limit);
+        // Validate contentId
+        const parsedContentId = parseInt(contentId);
+        if (!contentId || isNaN(parsedContentId) || parsedContentId <= 0) {
+            throw new Error('ID nội dung không hợp lệ.');
+        }
 
-    // Lấy comments gốc (parentId = null) với thông tin user và replies
-    const { count, rows } = await Comment.findAndCountAll({
-        where: createBasicWhereCondition({
-            contentType,
-            contentId: parseInt(contentId),
-            parentId: null
-        }),
-        include: createCommentsIncludeArray(),
-        attributes: {
-            include: [createRepliesCountSubquery()]
-        },
-        order: createOrderCondition(sort),
-        limit,
-        offset
-    });
+        const { page, limit, sort, userId } = normalizeQueryParams(query);
+        const offset = calculateOffset(page, limit);
 
-    // Xử lý dữ liệu comments
-    const processedComments = await Promise.all(rows.map(async (comment) => {
-        const commentData = processCommentData(comment, userId, 0); // Depth 0 for root comments
-
-        // Thêm episode number nếu là episode
+        // Kiểm tra content tồn tại trước khi query comments
         if (contentType === CONTENT_TYPES.EPISODE) {
-            const episode = await Episode.findByPk(contentId, { attributes: ['episodeNumber'] });
-            if (episode) {
-                commentData.episodeNumber = episode.episodeNumber;
-                commentData.episodeTitle = `Tập ${episode.episodeNumber}`;
+            const episode = await Episode.findByPk(parsedContentId, { attributes: ['id'] });
+            if (!episode) {
+                throw new Error('Tập phim không tồn tại.');
+            }
+        } else if (contentType === CONTENT_TYPES.MOVIE) {
+            const movie = await Movie.findByPk(parsedContentId, { attributes: ['id'] });
+            if (!movie) {
+                throw new Error('Phim không tồn tại.');
             }
         }
 
-        // Xử lý replies nếu có
-        if (commentData.replies && commentData.replies.length > 0) {
-            commentData.replies = await processRepliesData(
-                commentData.replies,
-                userId,
-                contentId,
-                contentType,
-                1 // Start replies at depth 1
-            );
-        }
+        // Lấy comments gốc (parentId = null) với thông tin user và replies
+        const whereCondition = createBasicWhereCondition({
+            contentType,
+            contentId: parsedContentId,
+            parentId: null
+        });
 
-        return commentData;
-    }));
+        // Sử dụng transaction để đảm bảo tính nhất quán
+        const result = await sequelize.transaction(async (t) => {
+            // 1. Đếm tổng số bình luận gốc (root comments) một cách chính xác
+            const totalRootComments = await Comment.count({
+                where: whereCondition,
+                transaction: t
+            });
 
-    return {
-        data: processedComments,
-        meta: {
-            page,
-            limit,
-            total: count,
-            totalPages: Math.ceil(count / limit)
-        }
-    };
-};
-
-/**
- * Lấy các bình luận trả lời cho một bình luận cha
- * @param {number} parentId - ID của bình luận cha
- * @param {Object} query - Đối tượng query (page, limit, sort, userId)
- * @returns {Promise<Object>} Danh sách bình luận trả lời và thông tin phân trang
- */
-const getReplies = async (parentId, query = {}) => {
-    const { page, limit, sort, userId } = normalizeQueryParams(query);
-    const offset = calculateOffset(page, limit);
-
-    const parentComment = await Comment.findByPk(parentId);
-    if (!parentComment) {
-        throw new Error('Bình luận cha không tồn tại.');
-    }
-    
-
-    const whereCondition = createBasicWhereCondition({
-        parentId: parseInt(parentId)
-    });
-
-    const totalReplies = await Comment.count({
-        where: whereCondition
-    });
-
-    // Early return nếu không có replies
-    if (totalReplies === 0) {
-        return {
-            data: [],
-            meta: {
-                page,
-                limit,
-                total: 0,
-                totalPages: 0
+            // Early return nếu không có comments (trong transaction)
+            if (totalRootComments === 0) {
+                return { rows: [], totalRootComments: 0 };
             }
-        };
-    }
 
-    // Lấy replies của parent comment
-    const rows = await Comment.findAll({
-        where: whereCondition,
-        include: [
-            createUserInclude(),
-            {
-                model: Comment,
-                as: 'replies',
-                where: { isHidden: false },
-                required: false,
-                include: [createUserInclude()],
+            // 2. Lấy danh sách bình luận gốc đã phân trang
+            const rows = await Comment.findAll({
+                where: whereCondition,
+                include: [
+                    createUserInclude(),
+                    {
+                        model: Comment,
+                        as: 'replies',
+                        where: { isHidden: false, isApproved: true },
+                        required: false,
+                        include: [createUserInclude()],
+                        attributes: {
+                            include: [createRepliesCountSubquery()]
+                        },
+                    }
+                ],
                 attributes: {
                     include: [createRepliesCountSubquery()]
                 },
-            }
-        ],
-        attributes: {
-            include: [createRepliesCountSubquery()]
-        },
-        order: createOrderCondition(sort),
-        limit,
-        offset
-    });
+                order: createOrderCondition(sort),
+                limit,
+                offset,
+                transaction: t
+            });
 
-    // Xử lý dữ liệu replies với depth tracking
-    const processedReplies = await Promise.all(rows.map(async (reply) => {
-        const replyData = processCommentData(reply, userId, 1); // Level 1 replies
-        // Thêm episode number nếu là episode comment
-        if (replyData.contentType === CONTENT_TYPES.EPISODE) {
-            const episode = await Episode.findByPk(replyData.contentId, { attributes: ['episodeNumber'] });
-            if (episode) {
-                replyData.episodeNumber = episode.episodeNumber;
-                replyData.episodeTitle = `Tập ${episode.episodeNumber}`;
-            }
-        }
-
-        replyData.replies = [];
-
-        // // Xử lý nested replies nếu có
-        // if (replyData.replies && replyData.replies.length > 0) {
-        //     replyData.replies = await processRepliesData(
-        //         replyData.replies,
-        //         userId,
-        //         parentComment.contentId,
-        //         parentComment.contentType,
-        //         2 // Level 2 replies (max depth)
-        //     );
-        // }
-
-        return replyData;
-    }));
-
-    return {
-        data: processedReplies,
-        meta: {
-            page,
-            limit,
-            total: totalReplies,
-            totalPages: Math.ceil(totalReplies / limit)
-        }
-    };
-};
-
-/**
- * Lấy bình luận theo phim + tập (merge)
- * @param {number} movieId - ID của phim
- * @param {Object} query - Đối tượng query (page, limit, sort, userId)
- * @returns {Promise<Object>} Danh sách bình luận đã merge và thông tin phân trang
- */
-const getCommentsForMovieWithEpisodes = async (movieId, query = {}) => {
-    const { page, limit, sort, userId } = normalizeQueryParams(query);
-    const offset = calculateOffset(page, limit);
-
-    // Validate movieId
-    if (!movieId || isNaN(movieId)) {
-        throw new Error('Invalid movieId provided');
-    }
-
-    // Tạo map episode ID -> episode number
-    const episodeMap = await createEpisodeMap(movieId);
-    const episodeIds = Array.from(episodeMap.keys());
-
-    // Early return nếu không có episodes
-    if (episodeIds.length === 0) {
-        // Chỉ tìm comments của movie
-        return await getComments(CONTENT_TYPES.MOVIE, movieId, query);
-    }
-
-    // Tạo điều kiện where cho movie và episodes
-    const whereCondition = createBasicWhereCondition({
-        [Op.or]: [
-            { contentType: CONTENT_TYPES.MOVIE, contentId: parseInt(movieId) },
-            { contentType: CONTENT_TYPES.EPISODE, contentId: { [Op.in]: episodeIds } }
-        ],
-        parentId: null // Chỉ lấy comments gốc
-    });
-
-    // Sử dụng transaction để đảm bảo tính nhất quán
-    const result = await sequelize.transaction(async (t) => {
-        // 1. Đếm tổng số bình luận gốc (root comments) một cách chính xác
-        const totalRootComments = await Comment.count({
-            where: whereCondition,
-            transaction: t
+            return { rows, totalRootComments };
         });
 
         // Early return nếu không có comments
-        if (totalRootComments === 0) {
+        if (result.totalRootComments === 0) {
             return {
                 data: [],
                 meta: {
@@ -1081,71 +1030,391 @@ const getCommentsForMovieWithEpisodes = async (movieId, query = {}) => {
             };
         }
 
-        // 2. Lấy danh sách bình luận gốc đã phân trang
-        const rows = await Comment.findAll({
-            where: whereCondition,
-            include: [
-                createUserInclude(),
-                {
-                    model: Comment,
-                    as: 'replies',
-                    where: { isHidden: false },
-                    required: false,
-                    include: [createUserInclude()],
-                    attributes: {
-                        include: [createRepliesCountSubquery()]
-                    },
+        // Cache episode info nếu cần (tránh N+1 query)
+        let episodeInfo = null;
+        if (contentType === CONTENT_TYPES.EPISODE) {
+            try {
+                const episode = await Episode.findByPk(parsedContentId, { attributes: ['episodeNumber'] });
+                if (episode) {
+                    episodeInfo = {
+                        episodeNumber: episode.episodeNumber,
+                        episodeTitle: `Tập ${episode.episodeNumber}`
+                    };
                 }
-            ],
-            attributes: {
-                include: [createRepliesCountSubquery()]
-            },
-            order: createOrderCondition(sort),
-            limit,
-            offset,
-            transaction: t
-        });
-
-        return { rows, totalRootComments };
-    });
-
-    // Xử lý dữ liệu comments với thông tin episode
-    const processedComments = await Promise.all(result.rows.map(async (comment) => {
-        const commentData = processCommentData(comment, userId, 0); // Depth 0 for root comments
-
-        // Thêm episode number nếu là episode comment
-        if (commentData.contentType === CONTENT_TYPES.EPISODE) {
-            const episodeNumber = episodeMap.get(commentData.contentId);
-            if (episodeNumber !== undefined) {
-                commentData.episodeNumber = episodeNumber;
-                commentData.episodeTitle = `Tập ${episodeNumber}`;
+            } catch (episodeError) {
+                console.error('Failed to fetch episode info:', episodeError);
+                // Không throw error, chỉ log và tiếp tục
             }
         }
 
-        commentData.replies = [];
+        // Xử lý dữ liệu comments
+        const processedComments = await Promise.all(result.rows.map(async (comment) => {
+            const commentData = processCommentData(comment, userId, 0); // Depth 0 for root comments
 
-        // // Xử lý replies nếu có
-        // if (commentData.replies && commentData.replies.length > 0) {
-        //     commentData.replies = await processRepliesWithEpisodeInfo(
-        //         commentData.replies,
-        //         userId,
-        //         episodeMap,
-        //         1 // Start replies at depth 1
-        //     );
-        // }
+            // Thêm episode number nếu là episode và có thông tin
+            if (contentType === CONTENT_TYPES.EPISODE && episodeInfo) {
+                commentData.episodeNumber = episodeInfo.episodeNumber;
+                commentData.episodeTitle = episodeInfo.episodeTitle;
+            }
 
-        return commentData;
-    }));
+            // Xử lý replies nếu có
+            if (commentData.replies && commentData.replies.length > 0) {
+                try {
+                    commentData.replies = await processRepliesData(
+                        commentData.replies,
+                        userId,
+                        parsedContentId,
+                        contentType,
+                        1 // Start replies at depth 1
+                    );
+                } catch (replyError) {
+                    console.error('Failed to process replies:', replyError);
+                    commentData.replies = []; // Fallback to empty array
+                }
+            }
 
-    return {
-        data: processedComments,
-        meta: {
-            page,
-            limit,
-            total: result.totalRootComments,
-            totalPages: Math.ceil(result.totalRootComments / limit)
+            return commentData;
+        }));
+            
+        return {
+            data: processedComments,
+            meta: {
+                page,
+                limit,
+                total: result.totalRootComments,
+                totalPages: Math.ceil(result.totalRootComments / limit)
+            }
+        };
+    } catch (error) {
+        console.error('Error in getComments:', {
+            contentType,
+            contentId,
+            error: error.message,
+            stack: error.stack
+        });
+        throw error;
+    }
+};
+
+/**
+ * Lấy các bình luận trả lời cho một bình luận cha
+ * @param {number} parentId - ID của bình luận cha
+ * @param {Object} query - Đối tượng query (page, limit, sort, userId)
+ * @returns {Promise<Object>} Danh sách bình luận trả lời và thông tin phân trang
+ */
+const getReplies = async (parentId, query = {}) => {
+    try {
+        // Validate parentId
+        const parsedParentId = parseInt(parentId);
+        if (!parentId || isNaN(parsedParentId) || parsedParentId <= 0) {
+            throw new Error('ID bình luận cha không hợp lệ.');
         }
-    };
+
+        const { page, limit, sort, userId } = normalizeQueryParams(query);
+        const offset = calculateOffset(page, limit);
+
+        // Kiểm tra parent comment tồn tại và hợp lệ
+        const parentComment = await Comment.findByPk(parsedParentId, {
+            attributes: ['id', 'parentId', 'contentId', 'contentType', 'isApproved', 'isHidden']
+        });
+        
+        if (!parentComment) {
+            throw new Error('Bình luận cha không tồn tại.');
+        }
+
+        // Kiểm tra parent comment có bị ẩn hoặc chưa được duyệt
+        if (parentComment.isHidden || !parentComment.isApproved) {
+            throw new Error('Bình luận cha không khả dụng.');
+        }
+
+        // Tính depth của parent comment để đảm bảo không vượt quá MAX_COMMENT_DEPTH
+        const parentDepth = await calculateCommentDepth(parsedParentId);
+        if (parentDepth >= MAX_COMMENT_DEPTH) {
+            // Parent đã ở độ sâu tối đa, không có replies
+            return {
+                data: [],
+                meta: {
+                    page,
+                    limit,
+                    total: 0,
+                    totalPages: 0
+                }
+            };
+        }
+
+        const whereCondition = createBasicWhereCondition({
+            parentId: parsedParentId
+        });
+        
+        // Sử dụng transaction để đảm bảo tính nhất quán
+        const result = await sequelize.transaction(async (t) => {
+            const totalReplies = await Comment.count({
+                where: whereCondition,
+                transaction: t
+            });
+
+            // Early return nếu không có replies
+            if (totalReplies === 0) {
+                return { rows: [], totalReplies: 0 };
+            }
+
+            // Lấy replies của parent comment
+            const rows = await Comment.findAll({
+                where: whereCondition,
+                include: [
+                    createUserInclude(),
+                    {
+                        model: Comment,
+                        as: 'replies',
+                        where: { isHidden: false, isApproved: true },
+                        required: false,
+                        include: [createUserInclude()],
+                        attributes: {
+                            include: [createRepliesCountSubquery()]
+                        },
+                    }
+                ],
+                attributes: {
+                    include: [createRepliesCountSubquery()]
+                },
+                order: createOrderCondition(sort),
+                limit,
+                offset,
+                transaction: t
+            });
+
+            return { rows, totalReplies };
+        });
+
+        // Early return nếu không có replies
+        if (result.totalReplies === 0) {
+            return {
+                data: [],
+                meta: {
+                    page,
+                    limit,
+                    total: 0,
+                    totalPages: 0
+                }
+            };
+        }
+
+        // Cache episode info nếu cần (tránh N+1 query)
+        const episodeCache = new Map();
+
+        // Xử lý dữ liệu replies với depth tracking
+        const processedReplies = await Promise.all(result.rows.map(async (reply) => {
+            const currentDepth = parentDepth + 1;
+            const replyData = processCommentData(reply, userId, currentDepth);
+            
+            // Thêm episode number nếu là episode comment
+            if (replyData.contentType === CONTENT_TYPES.EPISODE) {
+                try {
+                    // Kiểm tra cache trước
+                    if (!episodeCache.has(replyData.contentId)) {
+                        const episode = await Episode.findByPk(replyData.contentId, { attributes: ['episodeNumber'] });
+                        if (episode) {
+                            episodeCache.set(replyData.contentId, {
+                                episodeNumber: episode.episodeNumber,
+                                episodeTitle: `Tập ${episode.episodeNumber}`
+                            });
+                        }
+                    }
+                    
+                    const episodeInfo = episodeCache.get(replyData.contentId);
+                    if (episodeInfo) {
+                        replyData.episodeNumber = episodeInfo.episodeNumber;
+                        replyData.episodeTitle = episodeInfo.episodeTitle;
+                    }
+                } catch (episodeError) {
+                    console.error('Failed to fetch episode info for reply:', episodeError);
+                    // Không throw error, chỉ log và tiếp tục
+                }
+            }
+
+            // Đảm bảo không load nested replies nếu đã đạt max depth
+            if (currentDepth >= MAX_COMMENT_DEPTH) {
+                replyData.replies = [];
+                replyData.repliesCount = 0;
+                replyData.hasReplies = false;
+            } else {
+                // Giữ replies từ query nhưng đảm bảo chúng được xử lý đúng
+                replyData.replies = [];
+            }
+
+            return replyData;
+        }));
+
+        return {
+            data: processedReplies,
+            meta: {
+                page,
+                limit,
+                total: result.totalReplies,
+                totalPages: Math.ceil(result.totalReplies / limit)
+            }
+        };
+    } catch (error) {
+        console.error('Error in getReplies:', {
+            parentId,
+            error: error.message,
+            stack: error.stack
+        });
+        throw error;
+    }
+};
+
+/**
+ * Lấy bình luận theo phim + tập (merge)
+ * @param {number} movieId - ID của phim
+ * @param {Object} query - Đối tượng query (page, limit, sort, userId)
+ * @returns {Promise<Object>} Danh sách bình luận đã merge và thông tin phân trang
+ */
+const getCommentsForMovieWithEpisodes = async (movieId, query = {}) => {
+    try {
+        // Validate movieId
+        const parsedMovieId = parseInt(movieId);
+        if (!movieId || isNaN(parsedMovieId) || parsedMovieId <= 0) {
+            throw new Error('ID phim không hợp lệ.');
+        }
+
+        const { page, limit, sort, userId } = normalizeQueryParams(query);
+        const offset = calculateOffset(page, limit);
+
+        // Kiểm tra movie tồn tại
+        const movie = await Movie.findByPk(parsedMovieId, { attributes: ['id'] });
+        if (!movie) {
+            throw new Error('Phim không tồn tại.');
+        }
+
+        // Tạo map episode ID -> episode number với error handling
+        let episodeMap;
+        let episodeIds = [];
+        
+        try {
+            episodeMap = await createEpisodeMap(parsedMovieId);
+            episodeIds = Array.from(episodeMap.keys());
+        } catch (episodeError) {
+            console.error('Failed to create episode map:', episodeError);
+            // Fallback: chỉ lấy comments của movie
+            episodeMap = new Map();
+            episodeIds = [];
+        }
+
+        // Early return nếu không có episodes - chỉ lấy comments của movie
+        if (episodeIds.length === 0) {
+            return await getComments(CONTENT_TYPES.MOVIE, parsedMovieId, query);
+        }
+
+        // Giới hạn số lượng episodes để tránh query quá lớn
+        const MAX_EPISODES_PER_QUERY = 1000;
+        if (episodeIds.length > MAX_EPISODES_PER_QUERY) {
+            console.warn(`Movie ${parsedMovieId} has ${episodeIds.length} episodes, limiting to ${MAX_EPISODES_PER_QUERY}`);
+            episodeIds = episodeIds.slice(0, MAX_EPISODES_PER_QUERY);
+        }
+
+        // Tạo điều kiện where cho movie và episodes
+        const whereCondition = createBasicWhereCondition({
+            [Op.or]: [
+                { contentType: CONTENT_TYPES.MOVIE, contentId: parsedMovieId },
+                { contentType: CONTENT_TYPES.EPISODE, contentId: { [Op.in]: episodeIds } }
+            ],
+            parentId: null // Chỉ lấy comments gốc
+        });
+
+        // Sử dụng transaction để đảm bảo tính nhất quán
+        const result = await sequelize.transaction(async (t) => {
+            // 1. Đếm tổng số bình luận gốc (root comments) một cách chính xác
+            const totalRootComments = await Comment.count({
+                where: whereCondition,
+                transaction: t
+            });
+
+            // Early return nếu không có comments (trong transaction)
+            if (totalRootComments === 0) {
+                return { rows: [], totalRootComments: 0 };
+            }
+
+            // 2. Lấy danh sách bình luận gốc đã phân trang
+            const rows = await Comment.findAll({
+                where: whereCondition,
+                include: [
+                    createUserInclude(),
+                    {
+                        model: Comment,
+                        as: 'replies',
+                        where: { isHidden: false, isApproved: true },
+                        required: false,
+                        include: [createUserInclude()],
+                        attributes: {
+                            include: [createRepliesCountSubquery()]
+                        },
+                    }
+                ],
+                attributes: {
+                    include: [createRepliesCountSubquery()]
+                },
+                order: createOrderCondition(sort),
+                limit,
+                offset,
+                transaction: t
+            });
+
+            return { rows, totalRootComments };
+        });
+
+        // Early return nếu không có comments
+        if (result.totalRootComments === 0) {
+            return {
+                data: [],
+                meta: {
+                    page,
+                    limit,
+                    total: 0,
+                    totalPages: 0
+                }
+            };
+        }
+
+        // Xử lý dữ liệu comments với thông tin episode
+        const processedComments = await Promise.all(result.rows.map(async (comment) => {
+            const commentData = processCommentData(comment, userId, 0); // Depth 0 for root comments
+
+            // Thêm episode number nếu là episode comment
+            if (commentData.contentType === CONTENT_TYPES.EPISODE) {
+                const episodeNumber = episodeMap.get(commentData.contentId);
+                if (episodeNumber !== undefined) {
+                    commentData.episodeNumber = episodeNumber;
+                    commentData.episodeTitle = `Tập ${episodeNumber}`;
+                } else {
+                    // Fallback: log warning nếu không tìm thấy episode trong map
+                    console.warn(`Episode ${commentData.contentId} not found in episode map for movie ${parsedMovieId}`);
+                }
+            }
+
+            // Xóa replies để tránh load dữ liệu không cần thiết
+            commentData.replies = [];
+
+            return commentData;
+        }));
+
+        return {
+            data: processedComments,
+            meta: {
+                page,
+                limit,
+                total: result.totalRootComments,
+                totalPages: Math.ceil(result.totalRootComments / limit)
+            }
+        };
+    } catch (error) {
+        console.error('Error in getCommentsForMovieWithEpisodes:', {
+            movieId,
+            error: error.message,
+            stack: error.stack
+        });
+        throw error;
+    }
 };
 
 /**
@@ -1319,12 +1588,12 @@ const likeComment = async (commentId, userId) => {
             include: [createUserInclude()],
             transaction
         });
+        const commentData = processCommentData(updatedComment, userId)
 
         // Emit socket event for real-time updates
         try {
             const io = getIo();
             if (io) {
-                const commentData = processCommentData(updatedComment, userId);
                 io.emit('comment_liked', {
                     comment: commentData,
                     contentType: comment.contentType,
@@ -1338,7 +1607,7 @@ const likeComment = async (commentId, userId) => {
             console.error('Failed to emit comment_liked event:', socketError);
         }
 
-        return updatedComment;
+        return commentData;
     }, 'likeComment');
 };
 
@@ -1698,17 +1967,12 @@ const getCommentStatsAdmin = async (filters = {}) => {
         const analysisResults = await Promise.all(analysisPromises);
 
         analysisResults.forEach(result => {
-            if (result.sentiment) {
-                sentimentStats[result.sentiment] = (sentimentStats[result.sentiment] || 0) + 1;
-            }
-            if (result.categories && result.categories.length > 0) {
-                result.categories.forEach(category => {
-                    // Chuẩn hóa category key (ví dụ: "hate_speech" -> "hateSpeech")
-                    const formattedCategory = category.replace(/_([a-z])/g, g => g[1].toUpperCase());
-                    if (sentimentStats.hasOwnProperty(formattedCategory)) {
-                        sentimentStats[formattedCategory] = (sentimentStats[formattedCategory] || 0) + 1;
-                    }
-                });
+            if (result.classification) {
+                // Chuẩn hóa classification key (ví dụ: "hate_speech" -> "hateSpeech")
+                const formattedClassification = result.classification.replace(/_([a-z])/g, g => g[1].toUpperCase());
+                if (sentimentStats.hasOwnProperty(formattedClassification)) {
+                    sentimentStats[formattedClassification]++;
+                }
             }
         });
     }
@@ -2048,6 +2312,43 @@ const searchComments = async (params) => {
     };
 };
 
+/**
+ * Lấy comment cụ thể và parent chain của nó
+ * @param {number} commentId - ID của comment
+ * @param {number} userId - ID user hiện tại (optional)
+ * @returns {Promise<Object>} Comment và parent IDs
+ */
+const getCommentWithParents = async (commentId, userId = null) => {
+    try {
+        const comment = await Comment.findByPk(commentId, {
+            include: [createUserInclude()]
+        });
+
+        if (!comment) {
+            throw new Error('Comment không tồn tại.');
+        }
+
+        // Build parent chain
+        const parentChain = [];
+        let currentComment = comment;
+        
+        while (currentComment.parentId) {
+            parentChain.unshift(currentComment.parentId);
+            currentComment = await Comment.findByPk(currentComment.parentId);
+            if (!currentComment) break;
+        }
+
+        return {
+            comment: processCommentData(comment, userId),
+            parentChain, // Array of parent IDs from root to direct parent
+            depth: parentChain.length
+        };
+    } catch (error) {
+        console.error('Error in getCommentWithParents:', error);
+        throw error;
+    }
+};
+
 // ==================== EXPORTS ====================
 
 export {
@@ -2073,6 +2374,7 @@ export {
     canReplyToComment,
     getCommentStats,
     searchComments,
+    getCommentWithParents,
 
     withTransaction,
     safeTransaction,

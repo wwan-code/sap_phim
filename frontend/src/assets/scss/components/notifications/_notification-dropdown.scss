@@ -9,7 +9,7 @@
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--w-background-color);
+  background-color: var(--w-background-color-light);
   border-radius: var(--w-border-radius-lg);
   box-shadow: var(--w-box-shadow-lg);
   z-index: var(--w-zindex-dropdown);
@@ -138,6 +138,8 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    @include flex(column, stretch, stretch);
+    gap: var(--w-spacing-xs);
   }
 
   // States: Loading, Empty, Error

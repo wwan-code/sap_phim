@@ -83,7 +83,8 @@ const uploadCover = asyncHandler(async (req, res) => {
 // @access  Public
 const getUserByUuid = asyncHandler(async (req, res) => {
   const { uuid } = req.params;
-  const user = await userService.getUserByUuid(uuid);
+  const viewerId = req.user?.id || null; // Lấy viewerId nếu đã đăng nhập
+  const user = await userService.getUserByUuid(uuid, viewerId);
   res.status(200).json({
     data: user,
     message: 'Lấy thông tin người dùng thành công.',
@@ -98,8 +99,9 @@ const getUserByUuid = asyncHandler(async (req, res) => {
 const getUserFavoritesByUuid = asyncHandler(async (req, res) => {
   const { uuid } = req.params;
   const { page = 1, limit = 10 } = req.query;
+  const viewerId = req.user?.id || null;
   
-  const result = await userService.getUserFavoritesByUuid(uuid, parseInt(page), parseInt(limit));
+  const result = await userService.getUserFavoritesByUuid(uuid, parseInt(page), parseInt(limit), viewerId);
   
   res.status(200).json({
     data: result.favorites,
@@ -117,8 +119,9 @@ const getUserFavoritesByUuid = asyncHandler(async (req, res) => {
 const getUserWatchHistoryByUuid = asyncHandler(async (req, res) => {
   const { uuid } = req.params;
   const { page = 1, limit = 10 } = req.query;
+  const viewerId = req.user?.id || null;
   
-  const result = await userService.getUserWatchHistoryByUuid(uuid, parseInt(page), parseInt(limit));
+  const result = await userService.getUserWatchHistoryByUuid(uuid, parseInt(page), parseInt(limit), viewerId);
   
   res.status(200).json({
     data: result.watchHistories,
@@ -131,20 +134,28 @@ const getUserWatchHistoryByUuid = asyncHandler(async (req, res) => {
 });
 
 // @desc    Lấy danh sách bạn bè của người dùng theo UUID
-// @route   GET /api/users/:uuid/friends
+// @route   GET /api/users/:uuid/friends?page=1&limit=10
 // @access  Public
 const getUserFriendsByUuid = asyncHandler(async (req, res) => {
   const { uuid } = req.params;
-  const friends = await userService.getUserFriendsByUuid(uuid);
+  const { page = 1, limit = 10 } = req.query;
+  const viewerId = req.user?.id || null;
+  
+  const result = await userService.getUserFriendsByUuid(
+    uuid, 
+    parseInt(page), 
+    parseInt(limit), 
+    viewerId
+  );
+  
   res.status(200).json({
-    data: friends,
+    data: result.data,
     message: 'Lấy danh sách bạn bè thành công.',
     errors: null,
-    meta: null,
+    meta: result.meta,
   });
 });
 
-export { getProfile, updateProfile, uploadAvatar, uploadCover, getUserByUuid, getUserFavoritesByUuid, getUserWatchHistoryByUuid, getUserFriendsByUuid };
 // @desc    Tìm kiếm người dùng theo username (phục vụ mention)
 // @route   GET /api/users/search?q=...
 // @access  Public
@@ -158,8 +169,6 @@ const searchUsers = asyncHandler(async (req, res) => {
     meta: null,
   });
 });
-
-export { searchUsers };
 
 // @desc    Tìm kiếm chỉ trong danh sách bạn bè của user hiện tại
 // @route   GET /api/users/search/friends?q=...
@@ -175,4 +184,4 @@ const searchFriends = asyncHandler(async (req, res) => {
   });
 });
 
-export { searchFriends };
+export { getProfile, updateProfile, uploadAvatar, uploadCover, getUserByUuid, getUserFavoritesByUuid, getUserWatchHistoryByUuid, getUserFriendsByUuid, searchFriends, searchUsers };

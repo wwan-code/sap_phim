@@ -5,18 +5,20 @@
 @use './grid' as *;
 @use './form-select' as *;
 @use './forms' as *;
-@use './components/card-section' as *;
-@use './components/hero-movie' as *;
-@use './components/continue-watch' as *;
-@use './components/top-movies-section' as *;
-@use './components/movie-slider-card' as *;
-@use './components/custom-tooltip' as *;
-@use './components/movie-hover-tooltip' as *;
-@use './components/movie-theater-card' as *;
-@use './components/movie-theater-card-skeleton' as *;
+@use './components/custom-tooltip';
+@use './components/card-section';
+@use './components/hero-movie';
+@use './components/continue-watch';
+@use './components/top-movies-section';
+@use './components/movie-slider-card';
+@use './components/movie-hover-tooltip';
+@use './components/movie-theater-card';
+@use './components/movie-theater-card-skeleton';
 @use './components/movie-card';
 @use './components/movie-card-skeleton';
 @use './components/comment';
+@use './components/admin/stat-card';
+@use './pages/admin/dashboard';
 
 
 /* CSS Reset */
@@ -24,6 +26,8 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
@@ -43,6 +47,25 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color var(--w-transition-ease), color var(--w-transition-ease);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--w-primary-color-rgb), 0.8);
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--w-primary-color-rgb), 1);
 }
 
 h1,
@@ -170,10 +193,11 @@ button:not(:disabled),
     cursor: not-allowed;
   }
 }
+
 @media (prefers-reduced-motion: reduce) {
-    .btn {
-        transition: none;
-    }
+  .btn {
+    transition: none;
+  }
 }
 
 .btn-primary {
@@ -191,6 +215,15 @@ button:not(:disabled),
 
   &:hover {
     background-color: var(--w-secondary-color-hover);
+  }
+}
+
+.btn-danger {
+  @include button-style(var(--w-danger-color));
+  color: var(--w-text-color-inverted);
+
+  &:hover {
+    background-color: var(--w-danger-color-hover);
   }
 }
 

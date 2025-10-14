@@ -1,12 +1,11 @@
-@use '../_variables' as *;
-@use '../_mixins' as *;
+@use '../variables' as *;
+@use '../mixins' as *;
 
 .movie-watch-page {
   display: grid;
   grid-template-columns: 3fr 1fr; // Desktop layout: 3:1 ratio
   gap: var(--w-spacing-lg);
-  padding: var(--w-spacing-lg);
-  padding-top: calc(var(--w-header-height-desktop) + var(--w-spacing-lg));
+  padding: 0 var(--w-spacing-lg);
   max-width: var(--w-max-width);
   margin: 0 auto;
 
@@ -16,8 +15,12 @@
     padding: var(--w-spacing-md);
   }
 
-
-  
+  @include breakpoint(tv) {
+    grid-template-columns: 3fr 1.2fr;
+    gap: var(--w-spacing-tv-lg);
+    padding: 0 var(--w-spacing-tv-lg);
+    max-width: calc(var(--w-max-width) + 200px);
+  }
 
   &__main-content {
     display: flex;
@@ -62,6 +65,10 @@
       font-size: var(--w-font-size-xl);
       margin: 0;
       font-weight: var(--w-font-weight-bold);
+
+      @include breakpoint(tv) {
+        font-size: var(--w-font-size-tv-xl);
+      }
     }
 
     &__controls {
@@ -97,6 +104,11 @@
     background-color: var(--w-background-color-light);
     padding: var(--w-spacing-md);
     border-radius: var(--w-border-radius-lg);
+
+    @include breakpoint(tv) {
+      padding: var(--w-spacing-tv-md);
+      font-size: var(--w-font-size-tv-md);
+    }
 
     .meta-tags {
       @include flex(row, flex-start, center);
@@ -164,6 +176,10 @@
       top: auto;
     }
 
+    @include breakpoint(tv) {
+      top: calc(var(--w-header-height-desktop) + var(--w-spacing-tv-lg));
+    }
+
     .sidebar__feature-controls {
       padding-bottom: var(--w-spacing-md);
       border-bottom: 1px solid var(--w-border-color);
@@ -216,6 +232,10 @@
     margin: 0;
     padding-bottom: var(--w-spacing-sm);
     border-bottom: 1px solid var(--w-border-color);
+
+    @include breakpoint(tv) {
+      font-size: var(--w-font-size-tv-lg);
+    }
   }
 
   .sidebar__episode-list {
@@ -227,6 +247,17 @@
     display: flex;
     flex-direction: column;
     gap: var(--w-spacing-xs);
+
+    @include breakpoint(tv) {
+      max-height: 600px;
+
+      .episode-item {
+        a,
+        button {
+          font-size: var(--w-font-size-tv-md);
+        }
+      }
+    }
 
     .episode-item {
 

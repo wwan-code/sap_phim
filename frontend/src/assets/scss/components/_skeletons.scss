@@ -1,4 +1,5 @@
-@use '../_mixins' as *;
+@use '../variables' as *;
+@use '../mixins' as *;
 
 @keyframes shimmer {
   0% {

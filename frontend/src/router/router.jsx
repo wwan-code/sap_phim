@@ -29,6 +29,8 @@ import MovieDetailPage from '@/pages/MovieDetailPage';
 import MovieWatchPage from '@/pages/MovieWatchPage';
 import LatestMoviesPage from '@/pages/LatestMoviesPage';
 import TheaterMoviesPage from '@/pages/TheaterMoviesPage';
+import SettingPage from '@/pages/SettingPage';
+// import ReelsPage from '@/pages/ReelsPage';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -38,14 +40,13 @@ const router = createBrowserRouter(
         <Route index element={<HomePage />} />
         <Route path="profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
         <Route path="profile/:uuid" element={<ProfilePage />} />
-        
-        {/* Movie Routes */}
+        <Route path="settings" element={<PrivateRoute><SettingPage /></PrivateRoute>} />
         <Route path="movie/:slug" element={<MovieDetailPage />} />
         <Route path="watch/:slug/episode/:episodeNumber" element={<MovieWatchPage />} />
         <Route path="phim-moi-cap-nhat" element={<LatestMoviesPage />} />
         <Route path="phim-chieu-rap" element={<TheaterMoviesPage />} />
+        {/* <Route path="reels" element={<ReelsPage />} /> */}
       </Route>
-
       {/* Error Pages */}
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="/*" element={<NotFoundPage />} />

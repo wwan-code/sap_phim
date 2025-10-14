@@ -1,5 +1,3 @@
-// _comment.scss
-
 @use '../variables' as *;
 @use '../mixins' as *;
 
@@ -89,7 +87,6 @@
   }
 
   // Connector lines for replies
-
   &__item {
     position: relative;
     padding-left: var(--w-spacing-md); // Default padding for depth 0
@@ -989,4 +986,31 @@
   --avatar-size-0-mobile: 36px;
   --avatar-size-1-mobile: 32px;
   --avatar-size-2-mobile: 28px;
+}
+
+// ==========================================================================
+// Highlight Animation for Notification Navigation
+// ==========================================================================
+@keyframes highlightPulse {
+  0% {
+    background-color: transparent;
+  }
+  10% {
+    background-color: rgba(var(--w-primary-color-rgb), 0.2);
+  }
+  50% {
+    background-color: rgba(var(--w-primary-color-rgb), 0.15);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.comment-highlighted {
+  .comment-item__layout {
+    animation: highlightPulse 2s ease-in-out;
+    border-left: 3px solid var(--w-primary-color);
+    padding-left: var(--w-spacing-sm);
+    border-radius: var(--w-border-radius);
+  }
 }

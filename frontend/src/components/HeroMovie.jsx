@@ -1,21 +1,50 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
-import { FaPlay, FaStar, FaClock, FaChevronLeft, FaChevronRight, FaInfoCircle, FaHeart } from 'react-icons/fa';
+import { FaPlay, FaStar, FaClock, FaInfoCircle, FaHeart } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import movieService from '@/services/movieService';
+import favoriteService from '@/services/favoriteService';
 import { Link } from 'react-router-dom';
-// Import Swiper styles
+import HeroMovieSkeleton from './skeletons/HeroMovieSkeleton';
+import classNames from '@/utils/classNames';
+
 import 'swiper/css';
 import 'swiper/css/navigation';
 import CustomOverlayTrigger from './CustomTooltip/CustomOverlayTrigger';
 
 const HeroMovie = () => {
+  const { user: currentUser } = useSelector((state) => state.auth);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [currentMovie, setCurrentMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [swiperRef, setSwiperRef] = useState(null);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [loadingFavorite, setLoadingFavorite] = useState(false);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      if (!currentMovie || !currentUser || !currentMovie.id) {
+        setLoadingFavorite(false);
+        return;
+      }
+      setLoadingFavorite(true);
+      try {
+        const response = await favoriteService.check(currentMovie.id);
+        if (response.success) {
+          setIsFavorite(response.data.isFavorite);
+        }
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+      } finally {
+        setLoadingFavorite(false);
+      }
+    };
+    fetchStatus();
+  }, [currentMovie, currentUser]);
 
   useEffect(() => {
     const fetchTrendingMovies = async () => {
@@ -43,7 +72,6 @@ const HeroMovie = () => {
   const handleMovieSelect = (movie, index) => {
     setCurrentMovie(movie);
     setActiveSlideIndex(index);
-    // Slide to the selected movie and center it
     if (swiperRef) {
       swiperRef.slideTo(index);
     }
@@ -64,13 +92,6 @@ const HeroMovie = () => {
       swiperRef.slideTo(index);
     }
   };
-
-  // Update swiper when active slide changes (only when swiper is available)
-  // useEffect(() => {
-  //   if (swiperRef && activeSlideIndex !== undefined) {
-  //     swiperRef.slideTo(activeSlideIndex);
-  //   }
-  // }, [activeSlideIndex, swiperRef]);
 
   const getMovieTitle = (movie) => {
     if (!movie?.titles) return 'Unknown Title';
@@ -118,6 +139,30 @@ const HeroMovie = () => {
     return movie.genres.map(genre => genre.title);
   };
 
+  const handleFavoriteClick = async () => {
+    if (!currentUser) {
+      toast.error("Vui lòng đăng nhập để thực hiện thao tác này.");
+      return;
+    }
+    if (!currentMovie || !currentMovie.id) return;
+
+    const originalIsFavorite = isFavorite;
+    setIsFavorite(!originalIsFavorite);
+
+    try {
+      let response;
+      if (originalIsFavorite) {
+        response = await favoriteService.remove(currentMovie.id);
+      } else {
+        response = await favoriteService.add(currentMovie.id);
+      }
+      toast.success(response.message);
+    } catch (error) {
+      setIsFavorite(originalIsFavorite);
+      toast.error(error.response?.data?.message || "Đã xảy ra lỗi khi thay đổi trạng thái yêu thích.");
+    }
+  };
+
   const handlePlayNow = () => {
     if (currentMovie) {
       window.location.href = `/watch/${currentMovie.uuid}/episode/1`;
@@ -137,26 +182,7 @@ const HeroMovie = () => {
   };
 
   if (loading) {
-    return (
-      <div className="hero-movie hero-movie--loading">
-        <div className="hero-movie__skeleton">
-          <div className="hero-movie__skeleton-bg"></div>
-          <div className="hero-movie__skeleton-content">
-            <div className="hero-movie__skeleton-text">
-              <div className="hero-movie__skeleton-title"></div>
-              <div className="hero-movie__skeleton-meta"></div>
-              <div className="hero-movie__skeleton-description"></div>
-              <div className="hero-movie__skeleton-button"></div>
-            </div>
-            <div className="hero-movie__skeleton-carousel">
-              <div className="hero-movie__skeleton-card"></div>
-              <div className="hero-movie__skeleton-card"></div>
-              <div className="hero-movie__skeleton-card"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <HeroMovieSkeleton />;
   }
 
   if (error) {
@@ -202,8 +228,8 @@ const HeroMovie = () => {
 
       <div className="hero-movie__content">
         <div className="hero-movie__left">
-          <div className="hero-movie__info">
-            <h2 className="hero-movie__title texture-text line-count-2">
+          <div className="hero-movie__info" key={currentMovie.uuid}>
+            <h2 className="hero-movie__title texture-text">
               {getMovieTitle(currentMovie)}
             </h2>
 
@@ -248,15 +274,22 @@ const HeroMovie = () => {
                 <FaPlay className="hero-movie__play-icon" />
               </button>
               <div className="hero-movie__touch-group">
-                
                 <CustomOverlayTrigger
                   placement="top"
-                  tooltipId="tooltip-info"
-                  tooltip={<>Yêu thích</>}
+                  tooltipId="tooltip-favorite"
+                  tooltip={isFavorite ? 'Bỏ yêu thích' : 'Yêu thích'}
                 >
-                  <Link className="touch-btn">
-                    <FaHeart />
-                  </Link>
+                  <button
+                    className={classNames('touch-btn', { 'active': isFavorite, 'disabled': !currentUser })}
+                    onClick={handleFavoriteClick}
+                    disabled={!currentUser || loadingFavorite}
+                  >
+                    {loadingFavorite ? (
+                      <i className="fas fa-spinner fa-spin"></i>
+                    ) : (
+                      <FaHeart />
+                    )}
+                  </button>
                 </CustomOverlayTrigger>
                 <CustomOverlayTrigger
                   placement="top"
@@ -281,11 +314,19 @@ const HeroMovie = () => {
               spaceBetween={16}
               slidesPerView={5}
               breakpoints={{
+                576: {
+                  slidesPerView: 6,
+                  spaceBetween: 10,
+                },
                 768: {
-                  slidesPerView: 6.5,
+                  slidesPerView: 7,
+                  spaceBetween: 10,
                 },
                 992: {
-                  slidesPerView: 2.2,
+                  slidesPerView: 4.2,
+                },
+                1200: {
+                  slidesPerView: 3.2,
                 }
               }}
               centeredSlides={false}
@@ -310,24 +351,6 @@ const HeroMovie = () => {
                         alt={getMovieTitle(movie)}
                         className="hero-movie__card-image"
                       />
-                    </div>
-                    <div className="hero-movie__card-info">
-                      <h3 className="hero-movie__card-title line-count-1">
-                        {getMovieTitle(movie)}
-                      </h3>
-                      <div className="hero-movie__card-meta">
-                        {movie.imdb && (
-                          <span className="hero-movie__card-duration">
-                            <FaStar className="hero-movie__card-icon" />
-                            {formatDuration(movie.imdb)}
-                          </span>
-                        )}
-                        {movie.releaseDate && (
-                          <span className="hero-movie__card-year">
-                            {new Date(movie.releaseDate).getFullYear()}
-                          </span>
-                        )}
-                      </div>
                     </div>
                   </div>
                 </SwiperSlide>

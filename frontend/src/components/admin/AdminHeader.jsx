@@ -6,7 +6,7 @@ import { useDropdown } from '@/hooks/useDropdown';
 import classNames from '@/utils/classNames';
 
 import { BsBell, BsChatDots, BsList } from 'react-icons/bs';
-import { FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaUser, FaCog, FaSignOutAlt, FaHome } from 'react-icons/fa';
 import '@/assets/scss/components/admin/_admin-header.scss';
 
 const AdminHeader = ({ toggleSidebar }) => {
@@ -58,9 +58,9 @@ const AdminHeader = ({ toggleSidebar }) => {
                             <FaUser className="icon" />
                             <span>Profile</span>
                         </Link>
-                        <Link to="/admin/settings" className="dropdown-item" onClick={() => { toggle('admin-user-menu'); }}>
-                            <FaCog className="icon" />
-                            <span>Settings</span>
+                        <Link to="/" title="Trang chủ" className="dropdown-item" onClick={() => { toggle('admin-user-menu'); }}>
+                            <FaHome className="icon" />
+                            <span>Trang chủ</span>
                         </Link>
                         <div className="dropdown-divider"></div>
                         <button className="dropdown-item dropdown-button" onClick={handleLogout}>

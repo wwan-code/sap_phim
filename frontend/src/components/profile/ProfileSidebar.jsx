@@ -1,10 +1,12 @@
-import React, { useMemo } from 'react'; // Import useMemo
-import { FaMars, FaVenus, FaGenderless, FaGithub, FaTwitter, FaInstagram, FaFacebook } from 'react-icons/fa';
+import React, { useMemo } from 'react';
+import { FaMars, FaVenus, FaGenderless, FaGithub, FaTwitter, FaInstagram, FaFacebook, FaUserFriends, FaHeart, FaHistory, FaInfoCircle } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import classNames from '@/utils/classNames';
-import { formatDistanceToNow } from '@/utils/dateUtils'; // Import formatDistanceToNow
+import { formatDistanceToNow } from '@/utils/dateUtils';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
+import ProfileTabs from './ProfileTabs';
 
-const ProfileSidebar = ({ user: propUser, isOwnProfile = true }) => {
+const ProfileSidebar = ({ user: propUser, activeTab, setActiveTab, isOwnProfile = true }) => {
   const { user: authUser } = useSelector((state) => state.auth);
   const user = propUser || authUser;
 
@@ -30,9 +32,6 @@ const ProfileSidebar = ({ user: propUser, isOwnProfile = true }) => {
   const coverImageUrl = user?.coverUrl
     ? `${import.meta.env.VITE_SERVER_URL}${user.coverUrl}`
     : 'https://placehold.co/1200x300?text=Cover+Image';
-  const avatarImageUrl = user?.avatarUrl
-    ? `${import.meta.env.VITE_SERVER_URL}${user.avatarUrl}`
-    : 'https://placehold.co/150?text=Avatar';
 
   const hasSocialLinks = user?.socialLinks && Object.values(user.socialLinks).some((link) => link);
 
@@ -45,8 +44,8 @@ const ProfileSidebar = ({ user: propUser, isOwnProfile = true }) => {
     <aside className="profile-sidebar">
       <div className="profile-sidebar__cover" style={{ backgroundImage: `url(${coverImageUrl})` }}>
         <div className="profile-sidebar__avatar-wrapper">
-          <img src={avatarImageUrl} alt="Avatar" className="profile-sidebar__avatar" />
-          <span 
+          <img src={getAvatarUrl(user)} alt="Avatar" className="profile-sidebar__avatar" />
+          <span
             className={classNames('profile-sidebar__status', {
               'profile-sidebar__status--online': user?.online,
               'profile-sidebar__status--offline': !user?.online,
@@ -60,9 +59,14 @@ const ProfileSidebar = ({ user: propUser, isOwnProfile = true }) => {
           {user?.username || 'Username'}
           {user?.sex && getGenderIcon(user.sex)}
         </h3>
-        <p className="profile-sidebar__bio">
-          {user?.bio || 'Chưa có tiểu sử. Cập nhật tại tab Cài đặt.'}
-        </p>
+        <p className="profile-sidebar__bio" dangerouslySetInnerHTML={{ __html: user?.bio || 'Chưa có tiểu sử' }}></p>
+      </div>
+      <div className="profile-sidebar__tabs">
+        <ProfileTabs
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          isOwnProfile={isOwnProfile}
+        />
       </div>
       {hasSocialLinks && (
         <div className="profile-sidebar__socials">

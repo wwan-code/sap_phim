@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
-import authService from '@/services/authService';
+import * as authService from '@/services/authService';
 import userService from '@/services/userService';
-// import storage from '@/utils/storage'; // Remove direct storage import
-import { initializeSocket, disconnectSocket } from '@/socket/socketManager';
+import { disconnectSocket } from '@/socket/socketManager';
 
 // Redux Persist sẽ tự động tải và lưu trạng thái này
 const initialState = {
@@ -50,6 +49,7 @@ export const loginWithThirdParty = createAsyncThunk(
       const response = await authService.socialLogin(idToken, provider);
       return response.data.data; // Lấy data từ response.data
     } catch (error) {
+      console.log(error);
       const message = error.response?.data?.message || error.message || 'Đăng nhập bằng bên thứ 3 thất bại.';
       return rejectWithValue(message);
     }
@@ -127,7 +127,6 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       disconnectSocket();
-      toast.info('Bạn đã đăng xuất.');
     },
     // Action: Cập nhật thông tin người dùng (ví dụ sau khi chỉnh sửa profile)
     setUser: (state, action) => {

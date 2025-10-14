@@ -44,7 +44,7 @@ const NotificationItem = forwardRef(({ notification, onClose }, ref) => {
 
   // Xác định avatar và icon
   const senderAvatar = notification.sender?.avatarUrl
-    ? `${import.meta.env.VITE_SERVER_URL}${notification.sender.avatarUrl}`
+    ? notification.sender.avatarUrl?.startsWith('http') ? notification.sender.avatarUrl : `${import.meta.env.VITE_SERVER_URL}${notification.sender.avatarUrl}`
     : null;
   const typeIcon = iconByType[notification.type] || iconByType.default;
 

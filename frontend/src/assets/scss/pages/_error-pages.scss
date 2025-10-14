@@ -1,5 +1,6 @@
-// _error-pages.scss
+@use '../variables' as *;
 @use '../mixins' as *;
+
 .error-page {
   @include flex(row, center, center);
   min-height: 100vh;

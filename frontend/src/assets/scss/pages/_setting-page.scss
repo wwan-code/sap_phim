@@ -1,0 +1,212 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.setting-page {
+  position: relative;
+
+  &__container {
+    max-width: var(--w-max-width);
+    margin: 0 auto;
+    padding: 0 var(--w-spacing-md);
+
+    @include breakpoint(mobile) {
+      padding: 0 var(--w-spacing-sm);
+    }
+  }
+
+  &__content {
+    @include flex(row, flex-start, flex-start);
+    gap: var(--w-spacing-lg);
+
+    @include breakpoint(tablet-and-below) {
+      flex-direction: column;
+    }
+  }
+
+  &__sidebar {
+    flex-shrink: 0;
+    width: 280px;
+    background-color: var(--w-background-color-light);
+    border-radius: var(--w-border-radius-lg);
+    padding: var(--w-spacing-md);
+    @include shadow(md);
+
+    @include breakpoint(tablet-and-below) {
+      width: 100%;
+    }
+  }
+
+  &__nav {
+    @include flex(column, flex-start, stretch);
+    gap: var(--w-spacing-xs);
+  }
+
+  &__nav-item {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-md);
+    padding: var(--w-spacing-md);
+    border-radius: var(--w-border-radius-md);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    @include transition-ease(0.2s);
+    color: var(--w-text-color);
+    font-size: var(--w-font-size-md);
+    font-weight: var(--w-font-weight-medium);
+    text-align: left;
+
+    &:hover {
+      background-color: var(--w-background-color-dark);
+    }
+
+    &--active {
+      background-color: var(--w-background-color-dark);
+      color: var(--w-primary-color);
+      font-weight: var(--w-font-weight-semibold);
+    }
+  }
+
+  &__nav-icon {
+    font-size: var(--w-font-size-xl);
+  }
+
+  &__nav-label {
+    flex: 1;
+  }
+
+  &__sidebar-menu {
+    position: fixed;
+    top: var(--w-header-height-desktop);
+    left: -100%;
+    width: 280px;
+    border-top-right-radius: var(--w-border-radius-lg);
+    border-bottom-right-radius: var(--w-border-radius-lg);
+    background-color: var(--w-background-color-light);
+    z-index: 1000;
+    transition: left 0.3s ease-in-out;
+    @include shadow(md);
+    @include breakpoint(mobile) {
+      width: 240px;
+    }
+
+    &--open {
+      left: 0;
+
+      &+.setting-page__toggle-menu {
+        left: calc(280px + var(--w-spacing-sm));
+        @include breakpoint(mobile) {
+          left: calc(240px + var(--w-spacing-sm));
+        }
+      }
+    }
+  }
+
+  &__menu-list {
+    padding: var(--w-spacing-md);
+    list-style: none;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--w-spacing-sm);
+  }
+
+  &__menu-item {
+    @include flex(row, flex-start, center);
+    gap: var(--w-spacing-md);
+    padding: var(--w-spacing-md);
+    cursor: pointer;
+    color: var(--w-text-color);
+    border-radius: var(--w-border-radius-md);
+    transition: all 0.2s ease-in-out;
+
+    @include breakpoint(mobile) {
+      padding: var(--w-spacing-sm);
+      font-size: var(--w-font-size-sm);
+    }
+
+    &:hover {
+      background-color: var(--w-background-color-dark);
+    }
+
+    &--active {
+      background-color: var(--w-background-color-dark);
+      color: var(--w-primary-color);
+      font-weight: var(--w-font-weight-semibold);
+    }
+  }
+
+  &__menu-icon {
+    font-size: var(--w-font-size-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include breakpoint(mobile) {
+      font-size: var(--w-font-size-lg);
+    }
+  }
+
+  &__menu-label {
+    font-size: var(--w-font-size-md);
+    font-weight: var(--w-font-weight-medium);
+  }
+
+  &__toggle-menu {
+    position: fixed;
+    top: calc(var(--w-header-height-desktop) + var(--w-spacing-xl));
+    left: var(--w-spacing-sm);
+    z-index: 1000;
+    transition: left 0.3s ease-in-out;
+  }
+
+  &__toggle-button {
+    width: 40px;
+    height: 40px;
+    background-color: var(--w-background-color-light);
+    border: none;
+    border-radius: var(--w-border-radius-circle);
+    color: var(--w-text-color);
+    cursor: pointer;
+    @include flex(row, center, center);
+    transition: all 0.2s ease-in-out;
+    @include shadow(md);
+
+    &:hover {
+      background-color: var(--w-background-color-light);
+    }
+
+    &--active svg {
+      color: var(--w-primary-color);
+      transform: rotate(90deg);
+    }
+  }
+
+  &__main {
+    flex: 1;
+    background-color: var(--w-background-color-light);
+    border-radius: var(--w-border-radius-lg);
+    padding: var(--w-spacing-xl);
+    @include shadow(md);
+    min-height: 600px;
+    width: 100%;
+
+    @include breakpoint(mobile) {
+      padding: var(--w-spacing-md);
+    }
+  }
+}
+
+// Spinner animation
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--w-border-color);
+  border-top-color: var(--w-primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

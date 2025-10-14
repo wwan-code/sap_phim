@@ -23,10 +23,10 @@ const UserAvatar = ({ user, size = 48, className }) => {
       className={classNames('user-avatar', className)}
       style={{ width: `${size}px`, height: `${size}px` }}
       loading="lazy"
-      // onError={(e) => { // Fallback dự phòng nếu ảnh lỗi
-      //   e.target.onerror = null;
-      //   e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.username || '?')}&background=random&color=fff&size=${size * 2}`;
-      // }}
+      onError={(e) => { // Fallback dự phòng nếu ảnh lỗi
+        e.target.onerror = null;
+        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.username || '?')}&background=random&color=fff&size=${size * 2}`;
+      }}
     />
   );
 };

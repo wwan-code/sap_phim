@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useCommentStatsAdmin } from '@/hooks/useCommentQueries';
-import { useTheme } from '@/hooks/useTheme'; // Import useTheme hook
 import '@/assets/scss/pages/admin/_admin-pages.scss';
+import '@/assets/scss/pages/admin/_comment-analytics.scss';
 import { Line, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -28,7 +28,6 @@ ChartJS.register(
 );
 
 const CommentAnalytics = () => {
-  const { theme } = useTheme(); // Get current theme
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
@@ -45,12 +44,12 @@ const CommentAnalytics = () => {
   };
 
   const renderStatsCard = (title, value, description = '') => (
-    <div className="admin-page__card" style={{ padding: 'var(--w-spacing-lg)' }}>
-      <h3 className="admin-page__card--title" style={{ fontSize: 'var(--w-font-size-md)', color: 'var(--w-text-color-light)' }}>{title}</h3>
-      <p style={{ fontSize: 'var(--w-font-size-h3)', fontWeight: 'var(--w-font-weight-bold)', margin: 'var(--w-spacing-sm) 0' }}>
+    <div className="comment-analytics__stat-card">
+      <h3 className="comment-analytics__stat-card--title">{title}</h3>
+      <p className="comment-analytics__stat-card--value">
         {value !== undefined && value !== null ? value.toLocaleString('vi-VN') : 'N/A'}
       </p>
-      {description && <p style={{ fontSize: 'var(--w-font-size-sm)', color: 'var(--w-text-color-light)', margin: 0 }}>{description}</p>}
+      {description && <p className="comment-analytics__stat-card--description">{description}</p>}
     </div>
   );
 
@@ -222,46 +221,51 @@ const CommentAnalytics = () => {
       {isError && <div className="admin-page__error">Lỗi: {error.message}</div>}
 
       {stats && !isLoading && (
-        <>
-          <div className="admin-page__grid">
+        <div className="comment-analytics__content">
+          {/* Stats Cards */}
+          <div className="comment-analytics__grid comment-analytics__stats">
             {renderStatsCard('Tổng số bình luận', stats.totalComments)}
             {renderStatsCard('Bình luận đã duyệt', stats.approvedComments)}
             {renderStatsCard('Bình luận bị ẩn', stats.hiddenComments)}
             {renderStatsCard('Bình luận bị báo cáo', stats.reportedCommentsCount, 'Số bình luận có ít nhất 1 báo cáo')}
           </div>
 
-          <div className="admin-page__grid" style={{ marginTop: 'var(--w-spacing-xl)' }}>
-            <div className="admin-page__card" style={{ padding: 'var(--w-spacing-lg)' }}>
+          {/* Charts */}
+          <div className="comment-analytics__grid comment-analytics__charts">
+            <div className="comment-analytics__chart-container">
               <Line data={commentsByDateData} options={commentsByDateOptions} />
             </div>
-            <div className="admin-page__card" style={{ padding: 'var(--w-spacing-lg)' }}>
+            <div className="comment-analytics__chart-container">
               <Doughnut data={sentimentData} options={sentimentOptions} />
             </div>
           </div>
 
-          <div style={{ marginTop: 'var(--w-spacing-xl)' }}>
-            <h2>Chi tiết</h2>
-            
-            <div className="admin-page__grid">
-                <div className="admin-page__card" style={{ padding: 'var(--w-spacing-lg)' }}>
-                    <h4 className="admin-page__card--title">Top người dùng bình luận</h4>
-                    <ul>
-                        {stats.topUsers?.map(user => (
-                            <li key={user.userId}>{user.user.username} ({user.commentCount} bình luận)</li>
-                        ))}
-                    </ul>
-                </div>
-                <div className="admin-page__card" style={{ padding: 'var(--w-spacing-lg)' }}>
-                    <h4 className="admin-page__card--title">Top nội dung được bình luận</h4>
-                    <ul>
-                        {stats.topContent?.map(content => (
-                            <li key={`${content.contentType}-${content.contentId}`}>{content.contentType} #{content.contentId} ({content.commentCount} bình luận)</li>
-                        ))}
-                    </ul>
-                </div>
+          {/* Details */}
+          <div className="comment-analytics__grid comment-analytics__details">
+            <div className="comment-analytics__detail-card">
+              <h4 className="comment-analytics__detail-card--title">Top người dùng bình luận</h4>
+              <ul className="comment-analytics__detail-card--list">
+                {stats.topUsers?.map(user => (
+                  <li key={user.userId} className="comment-analytics__detail-card--list-item">
+                    <span className="comment-analytics__detail-card--user-info">{user.user.username}</span>
+                    <span className="comment-analytics__detail-card--count">{user.commentCount} bình luận</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="comment-analytics__detail-card">
+              <h4 className="comment-analytics__detail-card--title">Top nội dung được bình luận</h4>
+              <ul className="comment-analytics__detail-card--list">
+                {stats.topContent?.map(content => (
+                  <li key={`${content.contentType}-${content.contentId}`} className="comment-analytics__detail-card--list-item">
+                    <span className="comment-analytics__detail-card--user-info">{content.contentType} #{content.contentId}</span>
+                    <span className="comment-analytics__detail-card--count">{content.commentCount} bình luận</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

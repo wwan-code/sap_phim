@@ -9,10 +9,12 @@
   padding: var(--w-spacing-md) var(--w-spacing-lg);
   background-color: transparent;
   color: var(--w-text-color-inverted);
-  z-index: 1000;
+  z-index: var(--w-zindex-sticky);
   transition: all 0.3s ease-in-out;
-
   @include flex(row, space-between, center);
+  @include breakpoint(mobile) {
+      padding: var(--w-spacing-sm) var(--w-spacing-lg);
+    }
 
   &.header--fixed {
     position: fixed;
@@ -20,6 +22,9 @@
     padding: var(--w-spacing-sm) var(--w-spacing-lg);
     box-shadow: var(--w-box-shadow);
     backdrop-filter: blur(0.625em);
+    @include breakpoint(mobile) {
+      padding: var(--w-spacing-xs) var(--w-spacing-lg);
+    }
   }
 
   &__left,
@@ -47,7 +52,7 @@
     font-weight: var(--w-font-weight-bold);
 
     img {
-      height: 30px;
+      height: 40px;
       width: auto;
     }
 
@@ -121,7 +126,7 @@
       position: absolute;
       top: calc(100% + var(--w-spacing-md));
       right: 0;
-      background-color: var(--w-background-color);
+      background-color: var(--w-background-color-light);
       border-radius: var(--w-border-radius-lg);
       box-shadow: var(--w-box-shadow-lg);
       min-width: 180px;
@@ -213,19 +218,22 @@
     position: relative;
     width: 40px;
     height: 40px;
-    border-radius: var(--w-border-radius-md);
-    background-color: rgba(var(--w-background-color-rgb), 0.1);
+    border-radius: var(--w-border-radius-lg);
+    background-color: transparent;
     color: var(--w-text-color-inverted);
     transition: all 0.2s ease-in-out;
     cursor: pointer;
 
     &:hover {
-      background-color: rgba(var(--w-background-color-rgb), 0.2);
-      transform: scale(1.05);
+      color: var(--w-primary-color);
+    }
+
+    &-wrapper {
+      position: relative;
     }
 
     i {
-      font-size: var(--w-font-size-md);
+      font-size: var(--w-font-size-xxl);
     }
   }
 
@@ -236,24 +244,13 @@
     transform: translate(40%, -40%);
     min-width: 20px;
     height: 20px;
-    padding: 0 5px;
+    padding: 0 var(--w-spacing-xs);
     background-color: var(--w-danger-color);
+    border: 2px solid var(--w-background-color);
     color: var(--w-white);
     font-size: 11px;
-    font-weight: var(--w-font-weight-bold);
+    font-weight: var(--w-font-weight-semibold);
     border-radius: 50px;
     @include flex(row, center, center);
-    border: 2px solid var(--w-header-bg); // Border cùng màu nền header
-    box-shadow: 0 0 0 2px var(--w-danger-color);
-    animation: pulse-scale 1.5s infinite cubic-bezier(0.66, 0, 0, 1);
-
-    @keyframes pulse-scale {
-      0%, 100% {
-        transform: translate(40%, -40%) scale(1);
-      }
-      50% {
-        transform: translate(40%, -40%) scale(1.1);
-      }
-    }
   }
 }

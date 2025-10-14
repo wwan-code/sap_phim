@@ -1,6 +1,6 @@
 import express from 'express';
 import * as movieController from '../controllers/movie.controller.js';
-import { verifyToken, authorizeRoles } from '../middlewares/auth.middleware.js';
+import { verifyToken, authorizeRoles, verifyTokenOptional } from '../middlewares/auth.middleware.js';
 import { uploadMovieImages, handleUploadError } from '../middlewares/uploadMovie.middleware.js';
 
 const router = express.Router();
@@ -20,11 +20,21 @@ router.get('/movies', movieController.getMovies);
 // @access  Public
 router.get('/movies/all', movieController.getAllMovies);
 
-
 // @route   GET /api/movies/:id
-// @desc    Lấy chi tiết một phim
-// @access  Public
-router.get('/movies/:id', movieController.getMovieById);
+// @desc    Lấy chi tiết một phim (Dành cho Admin)
+// @access  Private/Admin
+router.get('/movies/:id', verifyToken, authorizeRoles('admin'), movieController.getMovieById);
+
+// @route   GET /api/movie/detail/:slug
+// @desc    Lấy chi tiết phim theo slug (Dành cho người dùng)
+// @access  Public (Optional Auth)
+router.get('/movie/detail/:slug', verifyTokenOptional, movieController.getMovieDetail);
+
+// @route   GET /api/movie/watch/:slug/episode/:episodeNumber?
+// @desc    Lấy dữ liệu xem phim theo slug và episodeNumber (Dành cho người dùng)
+// @access  Public (Optional Auth)
+router.get('/movie/watch/:slug/episode/:episodeNumber?', verifyTokenOptional, movieController.getMovieWatchData);
+router.get('/movie/watch/:slug', verifyTokenOptional, movieController.getMovieWatchData); // Route cho phim lẻ hoặc tập đầu tiên của phim bộ
 
 // @route   POST /api/movies
 // @desc    Tạo phim mới

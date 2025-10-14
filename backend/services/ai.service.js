@@ -9,10 +9,10 @@ import {
   formatGenresForPrompt,
   PROMPT_TEMPLATES,
   generateOtherTitlesWithAI,
-  classifyCommentWithAI // Import the new function
+  classifyCommentWithAI 
 } from '../utils/ai.utils.js';
 
-const { AiLog, User, Movie, Genre, Country, Category, WatchHistory, Series } = db;
+const { AiLog, User, Movie, Genre, Country, Category, WatchHistory } = db;
 
 /**
  * @desc Ghi log tương tác AI vào cơ sở dữ liệu
@@ -291,14 +291,6 @@ const suggestMovieData = async (userId, movieInfo) => {
       suggestedData.aiGeneratedOtherTitlesCount = aiGeneratedOtherTitlesCount;
     }
     
-    // Log interaction with metadata
-    await logAiInteraction(userId, prompt, aiResponse, 'suggestMovie', {
-      movieTitle: defaultTitle,
-      hasSeason: !!season,
-      genresCount: genres.length,
-      aiGeneratedOtherTitlesCount: aiGeneratedOtherTitlesCount // Log if other titles were AI-generated
-    });
-
     return suggestedData;
   } catch (error) {
     console.error('Lỗi khi gợi ý dữ liệu phim:', error);
@@ -581,6 +573,41 @@ const getAIAnalytics = async (userId, filters = {}) => {
   }
 };
 
+
+/**
+ * ===================== REELS AI ASSISTANT =====================
+ * Gợi ý caption, hashtags; phân tích mood/tags; gợi ý reels tương tự
+ */
+
+/**
+ * @desc Generate caption and hashtags for a Reel using AI
+ * @param {number} userId - User ID
+ * @param {string} videoDescription - Mô tả ngắn về nội dung video
+ * @returns {Promise<object>} Gợi ý caption và hashtags
+ */
+export const generateReelCaptionAndHashtags = async (userId, videoDescription) => {
+  try {
+    checkRateLimit(userId, 5, 60000); // 5 requests per minute for AI caption/hashtag
+
+    if (!validateInput({ videoDescription })) {
+      throw new Error('Invalid input detected.');
+    }
+
+    const prompt = buildPrompt('SUGGEST_REEL_CAPTION_HASHTAGS', { videoDescription });
+    const aiResponse = await callAIProvider(prompt);
+    const parsedResponse = parseAIResponse(aiResponse);
+
+    await logAiInteraction(userId, prompt, aiResponse, 'generateReelCaptionAndHashtags', {
+      videoDescriptionPreview: videoDescription.substring(0, 100)
+    });
+
+    return parsedResponse;
+  } catch (error) {
+    console.error('Error generating Reel caption and hashtags:', error);
+    throw new Error(`Không thể tạo caption và hashtags: ${error.message}`);
+  }
+};
+
 export {
   chatWithAI,
   recommendMovies,
@@ -589,7 +616,7 @@ export {
   generateMarketingContent,
   translateDescription,
   generateSEOContent,
-  classifyComment, // Export the new function
+  classifyComment,
   getAIAnalytics,
   logAiInteraction
 };

@@ -1,0 +1,350 @@
+2025-10-14 11:16:46:1646 [32minfo[39m: [32mReel processing worker initialized.[39m
+2025-10-14 11:16:47:1647 [32minfo[39m: [32mBullMQ Redis connected[39m
+2025-10-14 11:16:47:1647 [32minfo[39m: [32mBullMQ Redis ready[39m
+2025-10-14 11:37:05:375 [32minfo[39m: [32mReel processing worker initialized.[39m
+2025-10-14 11:37:05:375 [32minfo[39m: [32mBullMQ Redis connected[39m
+2025-10-14 11:37:05:375 [32minfo[39m: [32mBullMQ Redis ready[39m
+2025-10-14 11:40:20:4020 [32minfo[39m: [32mReel processing worker initialized.[39m
+2025-10-14 11:40:20:4020 [32minfo[39m: [32mBullMQ Redis connected[39m
+2025-10-14 11:40:21:4021 [32minfo[39m: [32mBullMQ Redis ready[39m
+2025-10-14 11:48:11:4811 [32minfo[39m: [32mReel processing worker initialized.[39m
+2025-10-14 11:48:11:4811 [32minfo[39m: [32mBullMQ Redis connected[39m
+2025-10-14 11:48:11:4811 [32minfo[39m: [32mBullMQ Redis ready[39m
+2025-10-14 12:03:59:359 [32minfo[39m: [32mReel processing worker initialized.[39m
+2025-10-14 12:03:59:359 [32minfo[39m: [32mBullMQ Redis connected[39m
+2025-10-14 12:04:00:40 [32minfo[39m: [32mBullMQ Redis ready[39m
+2025-10-14 12:42:37:4237 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 12:42:38:4238 [32minfo[39m: [32mReel processing worker initialized.[39m
+2025-10-14 12:42:38:4238 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 12:42:38:4238 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 12:42:38:4238 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 12:42:38:4238 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 12:42:38:4238 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 12:42:38:4238 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 12:43:15:4315 [32minfo[39m: [32m🛑 Shutting down Queue system...[39m
+2025-10-14 13:19:10:1910 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 13:19:10:1910 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 13:19:10:1910 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 13:19:10:1910 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 13:19:11:1911 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 13:19:11:1911 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 13:19:12:1912 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 13:19:12:1912 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 13:19:13:1913 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 13:19:57:1957 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 13:19:58:1958 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 13:20:05:205 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:20:10:2010 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:20:40:2040 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 13:20:40:2040 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 13:20:40:2040 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 13:20:40:2040 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 13:20:41:2041 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 13:20:41:2041 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 13:20:41:2041 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 13:20:41:2041 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 13:20:41:2041 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 13:20:41:2041 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 13:20:42:2042 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 13:22:04:224 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:24:47:2447 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:26:53:2653 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 13:26:54:2654 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 13:26:55:2655 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 13:34:05:345 [32minfo[39m: [32m🛑 Shutting down Queue system...[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 13:39:31:3931 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 13:39:32:3932 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 13:40:02:402 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:40:08:408 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:42:41:4241 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:42:48:4248 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:42:56:4256 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:43:38:4338 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:45:00:450 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:45:07:457 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 13:53:25:5325 [32minfo[39m: [32m🛑 Shutting down Queue system...[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 15:01:57:157 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 15:01:58:158 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 15:01:58:158 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 15:01:58:158 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 15:01:58:158 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 15:01:58:158 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 15:01:58:158 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 15:01:59:159 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 15:18:45:1845 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 15:22:50:2250 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 15:22:51:2251 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 15:22:51:2251 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 15:22:51:2251 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 15:22:51:2251 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 15:22:51:2251 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 15:22:51:2251 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 15:22:51:2251 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 17:13:03:133 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 17:13:04:134 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 17:20:34:2034 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 17:20:40:2040 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 17:21:17:2117 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 17:21:47:2147 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 17:22:17:2217 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 17:33:13:3313 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 17:38:14:3814 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 17:43:03:433 [32minfo[39m: [32m📊 Memory Usage:[39m
+2025-10-14 18:13:03:133 [32minfo[39m: [32m📊 Memory Usage:[39m
+2025-10-14 18:14:17:1417 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 18:43:03:433 [32minfo[39m: [32m📊 Memory Usage:[39m
+2025-10-14 18:43:58:4358 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 18:49:02:492 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 18:53:18:5318 [32minfo[39m: [32m🛑 Shutting down Queue system...[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 18:53:24:5324 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 18:53:25:5325 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 19:01:12:112 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 19:01:13:113 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 19:01:13:113 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 19:01:13:113 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 19:01:13:113 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 19:01:13:113 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 19:01:13:113 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 19:01:13:113 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 19:01:42:142 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 19:01:43:143 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 19:01:43:143 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 19:01:43:143 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 19:01:43:143 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 19:01:43:143 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 19:01:43:143 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 19:01:44:144 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 19:22:30:2230 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:25:00:250 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:31:42:3142 [32minfo[39m: [32m📊 Memory Usage:[39m
+2025-10-14 19:37:29:3729 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:37:35:3735 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:38:29:3829 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:57:38:5738 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:57:44:5744 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:58:03:583 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:58:09:589 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 19:58:16:5816 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 20:01:42:142 [32minfo[39m: [32m📊 Memory Usage:[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 20:03:34:334 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 20:03:35:335 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 20:03:35:335 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 20:03:35:335 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 20:03:35:335 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 20:03:35:335 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 20:03:35:335 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 20:03:36:336 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 20:10:00:100 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 20:10:35:1035 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 20:10:42:1042 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 20:11:16:1116 [32minfo[39m: [32m🛑 Shutting down Queue system...[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 20:11:24:1124 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 20:11:25:1125 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 20:41:24:4124 [32minfo[39m: [32m📊 Memory Usage:[39m
+2025-10-14 20:44:26:4426 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 20:45:47:4547 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 20:47:14:4714 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 20:50:02:502 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 20:50:04:504 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 20:50:04:504 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 20:50:04:504 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 20:50:05:505 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m✅ Reel Queue initialized[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32mVideo processing configured with 10 threads[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m✅ Upload directories verified[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m✅ Database connection established successfully[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m✅ Session store synchronized[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m🚀 Server running on 0.0.0.0:5000[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m📡 Environment: development[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m🌐 Access URLs:[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m   Local:    http://localhost:5000[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m   Network:  http://192.168.1.133:5000[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m🔄 Initializing Reel Processing Worker...[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m✅ Reel Processing Worker initialized[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m✅ Reel Worker initialized[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32m⏸️  Cron Tasks disabled (set ENABLE_CRON_TASKS=true to enable)[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32mRedis Worker connected[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32mRedis Queue connected[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32mRedis Events connected[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32mRedis Worker ready[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32mRedis Queue ready[39m
+2025-10-14 20:57:37:5737 [32minfo[39m: [32mRedis Events ready[39m
+2025-10-14 20:57:38:5738 [32minfo[39m: [32m📭 Reel queue drained - no more jobs to process[39m
+2025-10-14 21:27:37:2737 [32minfo[39m: [32m📊 Memory Usage:[39m
+2025-10-14 21:37:22:3722 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 21:37:29:3729 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m
+2025-10-14 21:39:13:3913 [33mwarn[39m: [33mRedis retry attempt 1, waiting 50ms[39m

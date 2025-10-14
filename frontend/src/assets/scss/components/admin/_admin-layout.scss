@@ -39,12 +39,10 @@
     flex-shrink: 0;
 
     &__left {
-      // Styles for left content, e.g., copyright
       font-weight: var(--w-font-weight-medium);
     }
 
     &__right {
-      // Styles for right content, e.g., links
       @include flex(row, flex-end, center);
       gap: var(--w-spacing-sm);
     }

@@ -99,7 +99,7 @@ const socialLogin = asyncHandler(async (req, res) => {
     throw new Error('Thiếu thông tin idToken hoặc provider.');
   }
 
-  const { user, accessToken, refreshToken } = await authService.socialLogin(idToken, provider);
+  const { user, accessToken, refreshToken } = await authService.socialLogin(idToken, provider, req);
 
   // Lưu refresh token vào cookie
   res.cookie('refreshToken', refreshToken, {

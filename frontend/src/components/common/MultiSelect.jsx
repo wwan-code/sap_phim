@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import classNames from '@/utils/classNames';
-import '@/assets/scss/components/_multi-select.scss';
+import '@/assets/scss/components/common/_multi-select.scss';
 
 const MultiSelect = React.memo(({
     options = [],

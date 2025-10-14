@@ -7,8 +7,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1001;
-  pointer-events: none; // Mặc định không tương tác
+  z-index: var(--w-zindex-offcanvas);
+  pointer-events: none;
   transition: all 0.3s ease-in-out;
 
   &--open {
@@ -34,18 +34,20 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: -1;
   }
 
   &__content {
     position: relative;
-    width: 300px; // Chiều rộng sidebar
-    max-width: 80%; // Giới hạn chiều rộng trên màn hình nhỏ
+    width: 300px;
+    max-width: 80%;
     height: 100%;
-    background-color: var(--w-sidebar-bg);
+    background-color: var(--w-background-color-dark);
     box-shadow: var(--w-box-shadow-lg);
-    transform: translateX(-100%); // Ẩn sidebar ban đầu
+    transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     padding: var(--w-spacing-lg);
+    z-index: 1;
     @include flex(column, flex-start, stretch);
   }
 
@@ -82,7 +84,7 @@
   }
 
   &__nav {
-    flex-grow: 1; // Đẩy footer xuống
+    flex-grow: 1;
     ul {
       list-style: none;
       padding: 0;

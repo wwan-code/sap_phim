@@ -1,6 +1,7 @@
 import api from './api';
+import axios from 'axios'; // Import axios for isCancel check
 
-const BASE_URL = '/movies';
+const BASE_URL = '/movie'; // Changed to /movie for new public routes, existing /movies routes will be handled by specific calls
 
 /**
  * @desc Lấy tất cả phim (không phân trang)
@@ -8,7 +9,7 @@ const BASE_URL = '/movies';
  */
 async function getAllMovies() {
   try {
-    const response = await api.get(`${BASE_URL}/all`);
+    const response = await api.get(`/movies/all`); // Keep old route for admin
     return response.data;
   } catch (err) {
     throw err;
@@ -22,7 +23,7 @@ async function getAllMovies() {
  */
 async function getMovies(params) {
   try {
-    const response = await api.get(BASE_URL, { params });
+    const response = await api.get('/movies', { params }); // Keep old route for admin
     return response.data;
   } catch (err) {
     throw err;
@@ -30,13 +31,43 @@ async function getMovies(params) {
 }
 
 /**
- * @desc Lấy chi tiết một phim theo ID
+ * @desc Lấy chi tiết một phim theo ID (Dành cho Admin)
  * @param {string} id - ID của phim
  * @returns {Promise<object>} Dữ liệu phản hồi từ API
  */
 async function getMovieById(id) {
   try {
-    const response = await api.get(`${BASE_URL}/${id}`);
+    const response = await api.get(`/movies/${id}`); // Keep old route for admin
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+}
+
+/**
+ * @desc Lấy chi tiết phim theo slug (Dành cho người dùng)
+ * @param {string} slug - Slug của phim
+ * @returns {Promise<object>} Dữ liệu phản hồi từ API
+ */
+async function getMovieDetailBySlug(slug) {
+  try {
+    const response = await api.get(`${BASE_URL}/detail/${slug}`);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+}
+
+/**
+ * @desc Lấy dữ liệu xem phim theo slug và episodeNumber (Dành cho người dùng)
+ * @param {string} slug - Slug của phim
+ * @param {string} [episodeNumber] - Số tập (tùy chọn)
+ * @returns {Promise<object>} Dữ liệu phản hồi từ API
+ */
+async function getMovieWatchDataBySlug(slug, episodeNumber) {
+  try {
+    const url = episodeNumber ? `${BASE_URL}/watch/${slug}/episode/${episodeNumber}` : `${BASE_URL}/watch/${slug}`;
+    const response = await api.get(url);
     return response.data;
   } catch (err) {
     throw err;
@@ -49,7 +80,7 @@ async function getMovieById(id) {
  * @returns {Promise<object>} Dữ liệu phản hồi từ API
  */
 function createMovie(movieData) {
-  return api.post(BASE_URL, movieData, {
+  return api.post('/movies', movieData, { // Keep old route for admin
     headers: {
       'Content-Type': 'multipart/form-data', // Quan trọng khi gửi file
     },
@@ -63,7 +94,7 @@ function createMovie(movieData) {
  * @returns {Promise<object>} Dữ liệu phản hồi từ API
  */
 function updateMovie(id, movieData) {
-  return api.put(`${BASE_URL}/${id}`, movieData, {
+  return api.put(`/movies/${id}`, movieData, { // Keep old route for admin
     headers: {
       'Content-Type': 'multipart/form-data', // Quan trọng khi gửi file
     },
@@ -76,7 +107,7 @@ function updateMovie(id, movieData) {
  * @returns {Promise<object>} Dữ liệu phản hồi từ API
  */
 function deleteMovie(id) {
-  return api.delete(`${BASE_URL}/${id}`);
+  return api.delete(`/movies/${id}`); // Keep old route for admin
 }
 
 /**
@@ -115,7 +146,7 @@ async function getLatestMovies(params) {
  */
 async function getSimilarMovies(movieId, params) {
   try {
-    const response = await api.get(`${BASE_URL}/${movieId}/similar`, { params });
+    const response = await api.get(`/movies/${movieId}/similar`, { params });
     return response.data;
   } catch (err) {
     throw err;
@@ -130,7 +161,7 @@ async function getSimilarMovies(movieId, params) {
  */
 async function getMoviesInSameSeries(movieId, params) {
   try {
-    const response = await api.get(`${BASE_URL}/${movieId}/series`, { params });
+    const response = await api.get(`/movies/${movieId}/series`, { params });
     return response.data;
   } catch (err) {
     throw err;
@@ -144,7 +175,7 @@ async function getMoviesInSameSeries(movieId, params) {
  */
 async function getMovieEpisodes(movieId) {
   try {
-    const response = await api.get(`${BASE_URL}/${movieId}/episodes`);
+    const response = await api.get(`/movies/${movieId}/episodes`);
     return response.data;
   } catch (err) {
     throw err;
@@ -159,7 +190,7 @@ async function getMovieEpisodes(movieId) {
  */
 async function getRecommendedMovies(movieId, params) {
   try {
-    const response = await api.get(`${BASE_URL}/${movieId}/recommendations`, { params });
+    const response = await api.get(`/movies/${movieId}/recommendations`, { params });
     return response.data;
   } catch (err) {
     throw err;
@@ -174,7 +205,7 @@ async function getRecommendedMovies(movieId, params) {
  */
 async function searchMovies(params, signal) {
   try {
-    const response = await api.get(`${BASE_URL}/search`, { params, signal });
+    const response = await api.get(`/movies/search`, { params, signal });
     return response.data;
   } catch (err) {
     if (axios.isCancel(err)) {
@@ -230,6 +261,8 @@ const movieService = {
   getRecommendedMovies,
   getTop10Movies,
   getTheaterMovies,
+  getMovieDetailBySlug,
+  getMovieWatchDataBySlug,
 };
 
 export default movieService;

@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const { Movie, Genre, Country, Category, Series, Episode, Section, sequelize } = db;
+const { Movie, Genre, Country, Category, Series, Episode, Section, Favorite, WatchHistory, sequelize } = db;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -133,6 +133,111 @@ const getMovieById = async (identifier) => {
   await movie.increment('views', { by: 1, silent: 'updatedAt' });
 
   return movie;
+};
+
+/**
+ * @desc Lấy chi tiết một phim theo slug cho người dùng
+ * @param {string} slug - Slug của phim
+ * @param {number} [userId] - ID của người dùng (tùy chọn)
+ * @returns {Promise<object>} Chi tiết phim và trạng thái yêu thích
+ */
+const getMovieDetailBySlug = async (slug, userId = null) => {
+  const movie = await Movie.findOne({
+    where: { slug },
+    include: [
+      { model: Genre, as: 'genres', attributes: ['id', 'title', 'slug'], through: { attributes: [] } },
+      { model: Country, as: 'country', attributes: ['id', 'title', 'slug'] },
+      { model: Category, as: 'category', attributes: ['id', 'title', 'slug'] },
+      { model: Series, as: 'series', attributes: ['id', 'title', 'slug'] },
+      { model: Episode, as: 'episodes', attributes: ['id', 'uuid', 'episodeNumber', 'duration'], order: [['episodeNumber', 'ASC']] },
+    ],
+  });
+
+  if (!movie) {
+    throw new Error('Phim không tồn tại.');
+  }
+
+  // Tăng lượt xem phim
+  await movie.increment('views', { by: 1, silent: 'updatedAt' });
+
+  let isFavorite = false;
+  if (userId) {
+    const favorite = await Favorite.findOne({
+      where: { userId, movieId: movie.id },
+    });
+    isFavorite = !!favorite;
+  }
+
+  return { movie, isFavorite };
+};
+
+/**
+ * @desc Lấy dữ liệu cần thiết cho trang xem phim
+ * @param {string} slug - Slug của phim
+ * @param {number} [episodeNumber] - Số tập (tùy chọn, mặc định là 1 cho phim bộ)
+ * @param {number} [userId] - ID của người dùng (tùy chọn)
+ * @returns {Promise<object>} Dữ liệu xem phim
+ */
+const getMovieWatchDataBySlug = async (slug, episodeNumber = null, userId = null) => {
+  const movie = await Movie.findOne({
+    where: { slug },
+    include: [
+      { model: Genre, as: 'genres', attributes: ['id', 'title', 'slug'], through: { attributes: [] } },
+      { model: Country, as: 'country', attributes: ['id', 'title', 'slug'] },
+      { model: Category, as: 'category', attributes: ['id', 'title', 'slug'] },
+      { model: Series, as: 'series', attributes: ['id', 'title', 'slug'] },
+    ],
+  });
+
+  if (!movie) {
+    throw new Error('Phim không tồn tại.');
+  }
+
+  const allEpisodes = await Episode.findAll({
+    where: { movieId: movie.id },
+    order: [['episodeNumber', 'ASC']],
+    attributes: ['id', 'uuid', 'episodeNumber', 'linkEpisode', 'duration', 'views'],
+  });
+
+  let currentEpisode = null;
+  if (movie.type === 'series' && allEpisodes.length > 0) {
+    const targetEpisodeNumber = episodeNumber ? parseInt(episodeNumber, 10) : 1;
+    currentEpisode = allEpisodes.find(ep => ep.episodeNumber === targetEpisodeNumber);
+    if (!currentEpisode) {
+      throw new Error(`Tập phim số ${targetEpisodeNumber} không tồn tại.`);
+    }
+  } else if (movie.type === 'movie' && allEpisodes.length > 0) {
+    // Phim lẻ chỉ có 1 tập, lấy tập đầu tiên
+    currentEpisode = allEpisodes[0];
+  } else if (allEpisodes.length === 0) {
+    throw new Error('Không có tập phim nào cho phim này.');
+  }
+
+  // Tăng lượt xem cho tập phim hiện tại
+  if (currentEpisode && movie) {
+    await currentEpisode.increment('views', { by: 1, silent: 'updatedAt' });
+    await movie.increment('views', { by: 1, silent: 'updatedAt' });
+  }
+
+  const recommendedMovies = await getRecommendedMovies(movie.id, { limit: 5 });
+  const moviesInSameSeries = await getMoviesInSameSeries(movie.id, { limit: 5 });
+
+  let watchProgress = 0;
+  if (userId && currentEpisode) {
+    const watchHistory = await WatchHistory.findOne({
+      where: { userId, movieId: movie.id, episodeId: currentEpisode.id },
+    });
+    watchProgress = watchHistory ? watchHistory.progress : 0;
+  }
+
+  return {
+    movie,
+    currentEpisode,
+    episodes: allEpisodes,
+    recommendedMovies: recommendedMovies.data,
+    moviesInSameSeries: moviesInSameSeries.data,
+    watchProgress,
+  };
 };
 
 /**
@@ -974,4 +1079,6 @@ export {
   getRecommendedMovies,
   getTop10Movies,
   getTheaterMovies,
+  getMovieDetailBySlug,
+  getMovieWatchDataBySlug,
 };

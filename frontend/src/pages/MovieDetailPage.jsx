@@ -6,14 +6,15 @@ import { toast } from 'react-toastify';
 import MovieCard from '@/components/MovieCard';
 import '@/assets/scss/pages/_movie-detail-page.scss';
 import { FaStar } from 'react-icons/fa';
-import Loader from '../components/common/Loader';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import { useSelector } from 'react-redux';
 import CommentSection from '@/components/comments/CommentSection';
 
 const MovieDetailPage = () => {
   const { slug } = useParams();
   const { user: currentUser } = useSelector((state) => state.auth);
-  const [movieId, setMovieId] = useState(null); // State to store movie ID for comments
+  const [movieId, setMovieId] = useState(null);
   const [movie, setMovie] = useState(null);
   const [similarMovies, setSimilarMovies] = useState([]);
   const [seriesMovies, setSeriesMovies] = useState([]);
@@ -26,14 +27,12 @@ const MovieDetailPage = () => {
     const fetchMovieDetails = async () => {
       try {
         setLoading(true);
-        const response = await movieService.getMovieById(slug);
+        const response = await movieService.getMovieDetailBySlug(slug); // Use new API
         if (response.success) {
           setMovie(response.data);
-          setMovieId(response.data.id); // Set movieId here
-          if (currentUser) {
-            const favRes = await favoriteService.check(response.data.id);
-            setIsFavorite(Boolean(favRes.data?.isFavorite));
-          }
+          setMovieId(response.data.id);
+          setIsFavorite(response.data.isFavorite); // Set isFavorite directly from API response
+
           // Fetch similar movies
           const similarResponse = await movieService.getSimilarMovies(response.data.id, { limit: 6 });
           if (similarResponse.success) {
@@ -43,17 +42,19 @@ const MovieDetailPage = () => {
           }
 
           // Fetch movies in the same series
-          const seriesResponse = await movieService.getMoviesInSameSeries(response.data.id, { limit: 6 });
-          if (seriesResponse.success) {
-            setSeriesMovies(seriesResponse.data);
-          } else {
-            console.warn('Could not fetch movies in the same series.');
+          if (response.data.seriesId) { // Only fetch if it belongs to a series
+            const seriesResponse = await movieService.getMoviesInSameSeries(response.data.id, { limit: 6 });
+            if (seriesResponse.success) {
+              setSeriesMovies(seriesResponse.data);
+            } else {
+              console.warn('Could not fetch movies in the same series.');
+            }
           }
         } else {
           setError('Movie not found.');
         }
       } catch (err) {
-        setError(err.message || 'Failed to fetch movie details.');
+        setError(err.response?.data?.message || err.message || 'Failed to fetch movie details.');
         console.error(err);
       } finally {
         setLoading(false);
@@ -63,7 +64,7 @@ const MovieDetailPage = () => {
     if (slug) {
       fetchMovieDetails();
     }
-  }, [slug]);
+  }, [slug, currentUser]); // Add currentUser to dependency array to re-fetch if login status changes
 
   const getImageUrl = (type = 'posterUrl') => {
     if (!movie || !movie.image || !movie.image[type]) {
@@ -90,7 +91,10 @@ const MovieDetailPage = () => {
   };
 
   const handleToggleFavorite = async () => {
-    if (!movie) return;
+    if (!movie || !currentUser) {
+      toast.info('Vui lòng đăng nhập để thêm vào yêu thích.');
+      return;
+    }
     try {
       setFavAnimating(true);
       if (isFavorite) {
@@ -109,16 +113,39 @@ const MovieDetailPage = () => {
     }
   };
 
+  const getWatchLink = () => {
+    if (!movie) return '#';
+    const initialEpisodeNumber = movie.type === 'series' && movie.episodes?.length > 0 ? movie.episodes[0].episodeNumber : 1;
+    return `/watch/${movie.slug}/episode/${initialEpisodeNumber}`;
+  };
+
   if (loading) {
-    return <Loader />;
+    return <LoadingSpinner fullscreen label="Đang tải chi tiết phim..." />;
   }
 
   if (error) {
-    return <div className="error-message container">{error}</div>;
+    return (
+      <div className="container page-container">
+        <ErrorMessage
+          variant="card"
+          title="Không thể tải chi tiết phim"
+          message={error}
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
   }
 
   if (!movie) {
-    return <div className="container">Movie data is not available.</div>;
+    return (
+      <div className="container page-container">
+        <ErrorMessage
+          variant="card"
+          title="Không tìm thấy phim"
+          message="Dữ liệu cho phim này không có sẵn."
+        />
+      </div>
+    );
   }
 
   const defaultTitle = movie.titles?.find(t => t.type === 'default')?.title || 'Untitled';
@@ -142,14 +169,9 @@ const MovieDetailPage = () => {
       <div className="container movie-detail-page__content">
         <div className="movie-detail-page__main-info">
           <div className="movie-detail-page__main-left">
-            <div className="movie-detail-page__top">
               <div className="movie-detail-page__poster">
                 <img src={getImageUrl('posterUrl')} alt={defaultTitle} />
               </div>
-            </div>
-            <div className="movie-detail-page__bottom">
-
-            </div>
           </div>
           <div className="movie-detail-page__main-right">
             <div className="movie-detail-page__details">
@@ -159,6 +181,8 @@ const MovieDetailPage = () => {
                 <span>{movie.year}</span>
                 <span>{movie.duration}</span>
                 <span className="movie-detail-page__quality">{movie.quality}</span>
+                {movie.country && <span>{movie.country.title}</span>}
+                {movie.category && <span>{movie.category.title}</span>}
               </div>
               {getGenres(movie).length > 0 && (
                 <div className="movie-detail-page__genres">
@@ -171,7 +195,7 @@ const MovieDetailPage = () => {
               <div className="movie-detail-page__actions">
                 <div className="movie-detail-page__actions-left">
                   <Link
-                    to={`/watch/${movie.slug}/episode/1`}
+                    to={getWatchLink()}
                     className="movie-detail-page__cta"
                   >
                     <i className="fas fa-play"></i>
@@ -187,7 +211,7 @@ const MovieDetailPage = () => {
                         aria-label={isFavorite ? 'Bỏ yêu thích' : 'Yêu thích'}
                       >
                         <i className="fas fa-heart" aria-hidden="true"></i>
-                        <span>{isFavorite ? 'Bỏ yêu thích' : 'Yêu thích'}</span>
+                        <span>Yêu thích</span>
                       </button>
                     </li>
                     <li>
@@ -278,7 +302,6 @@ const MovieDetailPage = () => {
           </section>
         )}
 
-        {/* Comment Section */}
         {movie && movieId && (
           <section id="comments" className="container">
             <CommentSection
@@ -286,8 +309,8 @@ const MovieDetailPage = () => {
               contentId={movie.id}
               movieId={movieId}
               currentUser={currentUser}
-              showEpisodeFilter={false} // For movie detail page, we show all comments merged
-            moderationMode={true}
+              showEpisodeFilter={false}
+              moderationMode={true}
             />
           </section>
         )}

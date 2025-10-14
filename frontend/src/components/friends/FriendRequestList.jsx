@@ -1,32 +1,32 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPendingRequests, fetchSentRequests } from '@/store/slices/friendSlice';
+import React from 'react';
+import { useGetPendingRequests, useGetSentRequests } from '@/hooks/useFriendQueries';
 import FriendCard from './FriendCard';
 import '@/assets/scss/components/_friend-request-list.scss';
 
 const FriendRequestList = ({ type }) => {
-  const dispatch = useDispatch();
-  const { pendingRequests, sentRequests, loading, error, lastFetchedPendingRequests, lastFetchedSentRequests } = useSelector((state) => state.friends);
+  // Chọn hook phù hợp dựa trên 'type' prop
+  const { 
+    data, 
+    isLoading, 
+    isError, 
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = type === 'pending' ? useGetPendingRequests() : useGetSentRequests();
 
-  useEffect(() => {
-    if (type === 'pending' && !lastFetchedPendingRequests) {
-      dispatch(fetchPendingRequests());
-    } else if (type === 'sent' && !lastFetchedSentRequests) {
-      dispatch(fetchSentRequests());
-    }
-  }, [dispatch, type, lastFetchedPendingRequests, lastFetchedSentRequests]);
+  // Flatten pages data
+  const requests = data?.pages?.flatMap(page => page.data) || [];
 
-  if (loading) {
-    return <div>Đang tải...</div>;
+  if (isLoading) {
+    return <div className="loading-state">Đang tải...</div>;
   }
 
-  if (error) {
-    return <div className="error-message">Lỗi: {error}</div>;
+  if (isError) {
+    return <div className="error-message">Lỗi: {error.message}</div>;
   }
 
-  const requests = type === 'pending' ? pendingRequests : sentRequests;
-
-  if (requests.length === 0) {
+  if (!requests || requests.length === 0) {
     return (
       <div className="no-results">
         {type === 'pending' ? 'Không có lời mời kết bạn nào đang chờ.' : 'Bạn chưa gửi lời mời kết bạn nào.'}
@@ -35,18 +35,33 @@ const FriendRequestList = ({ type }) => {
   }
 
   return (
-    <div className="friend-request-list">
-      {requests.map((request) => (
-        <FriendCard
-          key={request.id}
-          user={{
-            ...(type === 'pending' ? request.sender : request.receiver),
-            friendshipStatus: 'pending',
-            friendshipId: request.id, // Truyền id của lời mời để chấp nhận/từ chối
-          }}
-          type={type}
-        />
-      ))}
+    <div className="friend-request-list-container">
+      <div className="friend-request-list">
+        {requests.map((request) => (
+          <FriendCard
+            key={request.id}
+            user={{
+              ...(type === 'pending' ? request.sender : request.receiver),
+              friendshipStatus: 'pending',
+              friendshipId: request.id,
+            }}
+            type={type}
+          />
+        ))}
+      </div>
+
+      {/* Load More Button */}
+      {hasNextPage && (
+        <div className="load-more-container">
+          <button 
+            className="btn-load-more"
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? 'Đang tải...' : 'Xem thêm'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

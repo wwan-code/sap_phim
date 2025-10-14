@@ -3,6 +3,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import movieService from '@/services/movieService';
 import SearchResultDropdown from './SearchResultDropdown';
 import '@/assets/scss/components/search/_search-bar.scss';
+import classNames from '@/utils/classNames';
 
 const SearchBar = () => {
   // Từ khóa người dùng nhập
@@ -100,20 +101,22 @@ const SearchBar = () => {
   }, []);
 
   return (
-    <div className="search-bar" ref={searchContainerRef}>
-      <div className="search-bar__input-wrapper">
-        <input
-          type="text"
-          placeholder="Tìm kiếm..."
-          className="search-bar__input"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-        />
+    <div className={classNames('search-bar', { 'search-bar--focused': isFocused })} ref={searchContainerRef}>
+      <form onSubmit={(e) => e.preventDefault()} className="search-bar__form">
+        <div className="search-bar__input-wrapper">
+          <input
+            type="text"
+            placeholder="Tìm kiếm..."
+            className="search-bar__input"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+          />
+        </div>
         <button className="search-bar__button">
           <i className="fa-solid fa-search"></i>
         </button>
-      </div>
+      </form>
       {isFocused && (
         <SearchResultDropdown
           results={results}

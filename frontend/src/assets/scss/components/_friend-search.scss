@@ -1,58 +1,60 @@
+@use '../variables' as *;
 @use '../mixins' as *;
 
 .friend-search {
-  padding: var(--w-spacing-md);
+  padding: var(--w-spacing-md) 0;
 
   &__input-group {
-    @include flex(row, flex-start, center);
-    margin-bottom: var(--w-spacing-md);
-    border: 1px solid var(--w-border-color);
-    border-radius: var(--w-border-radius);
-    overflow: hidden;
+    @include flex(row, stretch, center);
+    position: relative;
+    margin-bottom: var(--w-spacing-lg);
   }
 
   &__input {
-    flex-grow: 1;
-    padding: var(--w-spacing-sm) var(--w-spacing-md);
-    border: none;
-    background-color: var(--w-input-bg);
-    color: var(--w-text-color);
+    width: 100%;
+    padding: var(--w-spacing-md) var(--w-spacing-lg);
+    padding-right: 50px; // Dành không gian cho button
     font-size: var(--w-font-size-md);
+    color: var(--w-text-color);
+    background-color: var(--w-input-bg);
+    border: 1px solid var(--w-border-color);
+    border-radius: var(--w-border-radius-md);
+    transition: var(--w-transition-ease);
 
     &:focus {
       outline: none;
-      background-color: var(--w-background-color-light);
-    }
-
-    @include placeholder {
-      color: var(--w-text-color-light);
+      border-color: var(--w-primary-color);
+      box-shadow: 0 0 0 3px rgba(var(--w-primary-color-rgb), 0.2);
     }
   }
 
   &__btn {
-    @include button-style(var(--w-primary-color), var(--w-text-color-inverted));
-    border-radius: 0;
-    padding: var(--w-spacing-sm) var(--w-spacing-md);
-    font-size: var(--w-font-size-md);
-    border-left: 1px solid var(--w-border-color);
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: calc(100% - 10px);
+    width: 40px;
+    border: none;
+    background-color: transparent;
+    color: var(--w-text-color-light);
+    cursor: pointer;
+    transition: var(--w-transition-ease);
+    border-radius: var(--w-border-radius-sm);
 
-    &:hover {
-      filter: brightness(0.9);
+    &:hover:not(:disabled) {
+      color: var(--w-primary-color);
+      background-color: var(--w-background-color-dark);
     }
 
     &:disabled {
-      opacity: 0.6;
       cursor: not-allowed;
     }
   }
 
   &__results {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--w-spacing-md);
-
-    @include breakpoint(mobile) {
-      grid-template-columns: 1fr;
-    }
   }
 }

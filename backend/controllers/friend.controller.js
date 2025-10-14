@@ -18,44 +18,60 @@ const sendFriendRequest = asyncHandler(async (req, res) => {
 });
 
 // @desc    Lấy danh sách bạn bè
-// @route   GET /api/friends
+// @route   GET /api/friends?page=1&limit=10&q=search
 // @access  Private
 const getFriends = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const friends = await friendService.getFriends(userId);
+  const { q, page = 1, limit = 10 } = req.query;
+  const result = await friendService.getFriends(
+    userId, 
+    q, 
+    parseInt(page), 
+    parseInt(limit)
+  );
   res.status(200).json({
-    data: friends,
+    data: result.data,
     message: 'Lấy danh sách bạn bè thành công.',
     errors: null,
-    meta: null,
+    meta: result.meta,
   });
 });
 
 // @desc    Lấy danh sách lời mời kết bạn đang chờ (người dùng là receiver)
-// @route   GET /api/friends/pending
+// @route   GET /api/friends/pending?page=1&limit=10
 // @access  Private
 const getPendingFriendRequests = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const pendingRequests = await friendService.getPendingFriendRequests(userId);
+  const { page = 1, limit = 10 } = req.query;
+  const result = await friendService.getPendingFriendRequests(
+    userId, 
+    parseInt(page), 
+    parseInt(limit)
+  );
   res.status(200).json({
-    data: pendingRequests,
+    data: result.data,
     message: 'Lấy danh sách lời mời đang chờ thành công.',
     errors: null,
-    meta: null,
+    meta: result.meta,
   });
 });
 
 // @desc    Lấy danh sách lời mời kết bạn đã gửi (người dùng là sender)
-// @route   GET /api/friends/sent
+// @route   GET /api/friends/sent?page=1&limit=10
 // @access  Private
 const getSentFriendRequests = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const sentRequests = await friendService.getSentFriendRequests(userId);
+  const { page = 1, limit = 10 } = req.query;
+  const result = await friendService.getSentFriendRequests(
+    userId, 
+    parseInt(page), 
+    parseInt(limit)
+  );
   res.status(200).json({
-    data: sentRequests,
+    data: result.data,
     message: 'Lấy danh sách lời mời đã gửi thành công.',
     errors: null,
-    meta: null,
+    meta: result.meta,
   });
 });
 
@@ -111,20 +127,23 @@ const removeFriend = asyncHandler(async (req, res) => {
 // @route   GET /api/friends/search?query=...
 // @access  Private
 const searchUsers = asyncHandler(async (req, res) => {
-  const query = req.query.query;
+  const { query, limit = 10, offset = 0 } = req.query;
   const currentUserId = req.user.id;
 
-  if (!query) {
-    res.status(400);
-    throw new Error('Tham số tìm kiếm không được để trống.');
-  }
-
-  const users = await friendService.searchUsers(query, currentUserId);
+  const users = await friendService.searchUsers(query, currentUserId, {
+    limit: parseInt(limit),
+    offset: parseInt(offset),
+  });
   res.status(200).json({
     data: users,
     message: 'Tìm kiếm người dùng thành công.',
     errors: null,
-    meta: null,
+    meta: {
+      total: users.length,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      hasMore: users.length === parseInt(limit),
+    },
   });
 });
 

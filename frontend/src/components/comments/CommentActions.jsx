@@ -85,9 +85,8 @@ const CommentActions = ({
                     </span>
                 </button>
             )}
-
-            {/* More Actions */}
-            <div className="comment-item__more-actions">
+            {currentUser && (
+                <div className="comment-item__more-actions">
                 <button
                     className="comment-item__more-button"
                     {...getTriggerProps(dropdownId, { role: 'menu', ariaLabel: 'Thêm hành động' })}
@@ -145,6 +144,7 @@ const CommentActions = ({
                     </div>
                 )}
             </div>
+            )}
         </div>
     );
 };

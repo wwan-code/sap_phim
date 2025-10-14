@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import ScrollToTop from '@/components/common/ScrollToTop';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import '@/assets/scss/components/admin/_admin-layout.scss';
@@ -19,6 +20,7 @@ const AdminLayout = () => {
 
   return (
     <div className={classNames('admin-layout', { 'admin-layout--sidebar-open': isSidebarOpen })}>
+      <ScrollToTop />
       {/* Sidebar */}
       <AdminSidebar isOpen={isSidebarOpen} toggleSidebar={closeSidebar} />
 

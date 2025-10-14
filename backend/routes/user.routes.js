@@ -1,6 +1,6 @@
 import express from 'express';
 import * as userController from '../controllers/user.controller.js';
-import { verifyToken, authorizeRoles } from '../middlewares/auth.middleware.js';
+import { verifyToken, authorizeRoles, verifyTokenOptional } from '../middlewares/auth.middleware.js';
 import { uploadImageUser } from '../middlewares/uploadImageUser.middleware.js';
 
 const router = express.Router();
@@ -16,10 +16,10 @@ router.get('/search', userController.searchUsers);
 router.get('/search/friends', verifyToken, userController.searchFriends);
 
 // Routes cho profile của người dùng khác (public)
-router.get('/:uuid', userController.getUserByUuid);
+router.get('/:uuid', verifyTokenOptional, userController.getUserByUuid);
 router.get('/:uuid/favorites', userController.getUserFavoritesByUuid);
 router.get('/:uuid/watch-history', userController.getUserWatchHistoryByUuid);
-router.get('/:uuid/friends', userController.getUserFriendsByUuid);
+router.get('/:uuid/friends', verifyTokenOptional, userController.getUserFriendsByUuid);
 
 
 export default router;

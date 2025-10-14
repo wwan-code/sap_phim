@@ -48,7 +48,7 @@
 
     &__spinner {
         position: absolute;
-        right: 40px; // Vị trí bên trái nút search
+        right: 40px; // Vá»‹ trÃ­ bÃªn trÃ¡i nÃºt search
         top: 50%;
         transform: translateY(-50%);
         width: 16px;
@@ -61,6 +61,47 @@
 }
 
 .search-results {
+    &__container {
+        position: relative;
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 12px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    &__scrollbar {
+        position: absolute;
+        top: 0;
+        right: 4px;
+        width: 4px;
+        height: 100%;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    &__scrollbar-thumb {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        border-radius: 999px;
+        background-color: var(--w-primary-color);
+        pointer-events: auto;
+        cursor: grab;
+        opacity: 0;
+        transition: background-color 0.2s ease;
+    }
+
+    &__scrollbar-thumb:active {
+        cursor: grabbing;
+    }
+
     position: absolute;
     top: calc(100% + var(--w-spacing-sm));
     left: 0;

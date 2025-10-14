@@ -31,9 +31,9 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
   if (allowedMimeTypes.includes(file.mimetype)) {
-    cb(null, true); // Chấp nhận file
+    cb(null, true);
   } else {
-    cb(new Error('Chỉ chấp nhận file ảnh JPG, PNG hoặc WEBP!'), false); // Từ chối file
+    cb(new Error('Chỉ chấp nhận file ảnh JPG, PNG hoặc WEBP!'), false);
   }
 };
 

@@ -1,6 +1,5 @@
 import { verifyAccessToken } from '../utils/jwt.js';
 import db from '../models/index.js';
-import { Op } from 'sequelize';
 
 const { User, Role } = db;
 

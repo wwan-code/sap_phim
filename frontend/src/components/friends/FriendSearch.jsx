@@ -1,33 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { searchUsers, clearSearchResults, sendFriendRequest } from '@/store/slices/friendSlice';
+import React, { useState } from 'react';
+import { useSearchUsers } from '@/hooks/useFriendQueries';
+import { useDebounce } from '@/hooks/useDebounce';
 import FriendCard from './FriendCard';
 import '@/assets/scss/components/_friend-search.scss';
 
 const FriendSearch = () => {
-  const dispatch = useDispatch();
-  const { searchResults, loading, error } = useSelector((state) => state.friends);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500); // Debounce 500ms
 
-  const handleSearch = useCallback(() => {
-    if (searchTerm.trim()) {
-      dispatch(searchUsers(searchTerm.trim()));
-    } else {
-      dispatch(clearSearchResults());
-    }
-  }, [dispatch, searchTerm]);
+  const {
+    data: searchResults,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+  } = useSearchUsers(debouncedSearchTerm, {
+    // Chỉ chạy query khi debouncedSearchTerm có giá trị
+    enabled: debouncedSearchTerm.length > 0,
+  });
 
-  useEffect(() => {
-    return () => {
-      dispatch(clearSearchResults());
-    };
-  }, [dispatch]);
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+  const loading = isLoading || isFetching;
 
   return (
     <div className="friend-search">
@@ -38,23 +30,24 @@ const FriendSearch = () => {
           placeholder="Tìm kiếm bạn bè theo tên, email hoặc UUID..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={handleKeyPress}
         />
-        <button className="friend-search__btn" onClick={handleSearch} disabled={loading}>
-          {loading ? <i className="fas fa-spinner fa-spin"/> : <i className="fas fa-search" />}
+        <button className="friend-search__btn" disabled={loading}>
+          {loading ? <i className="fas fa-spinner fa-spin" /> : <i className="fas fa-search" />}
         </button>
       </div>
 
-      {error && <div className="error-message">Lỗi: {error}</div>}
-      {searchResults.length > 0 ? (
+      {isError && <div className="error-message">Lỗi: {error.message}</div>}
+
+      {searchResults && searchResults.length > 0 && (
         <div className="friend-search__results">
-          {
-            searchResults.map((user) => (
-              <FriendCard key={user.id} user={user} type="search" />
-            ))
-          }
-        </div>) : (
-        !loading && searchTerm.trim() && <div className="no-results">Không tìm thấy người dùng nào.</div>
+          {searchResults.map((user) => (
+            <FriendCard key={user.id} user={user} type="search" />
+          ))}
+        </div>
+      )}
+
+      {!loading && debouncedSearchTerm && (!searchResults || searchResults.length === 0) && (
+        <div className="no-results">Không tìm thấy người dùng nào.</div>
       )}
     </div>
   );

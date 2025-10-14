@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js",
-    "worker": "node jobs/reelProcessor.worker.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -19,8 +18,8 @@
     "archiver": "^7.0.1",
     "axios": "^1.11.0",
     "bcrypt": "^5.1.1",
+    "bullmq": "^5.61.0",
     "cheerio": "^1.1.2",
-    "bullmq": "^5.21.2",
     "compression": "^1.8.1",
     "connect-session-sequelize": "^7.1.7",
     "cookie-parser": "^1.4.7",
@@ -43,9 +42,9 @@
     "node-cron": "^4.2.1",
     "redis": "^5.8.2",
     "sequelize": "^6.37.3",
-    "uuid": "^10.0.0",
     "sharp": "^0.34.4",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "winston": "^3.18.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

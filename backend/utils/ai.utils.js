@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 /**
  * AI Provider Configuration
@@ -205,25 +205,45 @@ YÊU CẦU: Tạo nội dung SEO tối ưu:
     
     // New prompt template for comment classification
     CLASSIFY_COMMENT: {
-        template: `Bạn là một chuyên gia phân tích bình luận, có khả năng phân loại các bình luận thành các loại sau: toxic, spam, hate speech, neutral, positive, negative.
+        template: `Bạn là một chuyên gia phân tích bình luận, có khả năng phân loại các bình luận vào MỘT trong các loại sau: positive, negative, neutral, toxic, spam, hate_speech.
 
 BÌNH LUẬN ĐẦU VÀO:
 "{commentText}"
 
-YÊU CẦU: Phân loại bình luận trên. Trả về kết quả dưới dạng JSON với cấu trúc sau:
+YÊU CẦU: Phân loại bình luận trên vào một loại DUY NHẤT phù hợp nhất. Trả về kết quả dưới dạng JSON với cấu trúc sau:
 
 {
-  "sentiment": "positive || negative || neutral",
-  "categories": ["toxic", "spam", "hate_speech"], // Có thể có nhiều loại hoặc không có
+  "classification": "positive || negative || neutral || toxic || spam || hate_speech",
   "reason": "Giải thích ngắn gọn lý do phân loại"
 }
 
 QUAN TRỌNG:
+- **CHỌN MỘT LOẠI DUY NHẤT**: Chỉ trả về một giá trị cho trường "classification". Ví dụ, nếu một bình luận vừa tiêu cực vừa độc hại, hãy chọn "toxic" vì nó cụ thể hơn.
 - **CHÍNH XÁC**: Đảm bảo phân loại chính xác dựa trên nội dung bình luận.
 - **NGẮN GỌN**: Giải thích lý do ngắn gọn và súc tích.
 - **KHÔNG SUY DIỄN**: Chỉ phân loại dựa trên thông tin có sẵn trong bình luận.
 - **TIẾNG VIỆT**: Phản hồi bằng tiếng Việt.`,
         variables: ['commentText']
+    },
+
+    SUGGEST_REEL_CAPTION_HASHTAGS: {
+        template: `Bạn là một chuyên gia marketing và sáng tạo nội dung video ngắn (Reels/Shorts) trên các nền tảng như TikTok, Instagram Reels. Bạn có khả năng phân tích nội dung video và tạo ra caption, hashtags hấp dẫn, thu hút người xem.
+
+MÔ TẢ VIDEO: "{videoDescription}"
+
+YÊU CẦU: Dựa trên mô tả video, hãy gợi ý một caption sáng tạo và một danh sách các hashtags liên quan, có xu hướng. Trả về kết quả dưới dạng JSON với cấu trúc sau:
+
+{
+  "caption": "Caption gợi ý hấp dẫn, có thể kèm emoji",
+  "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3", "#trending", "#viral"]
+}
+
+QUAN TRỌNG:
+- **SÁNG TẠO & HẤP DẪN**: Caption phải độc đáo, gây tò mò hoặc hài hước.
+- **LIÊN QUAN**: Hashtags phải liên quan trực tiếp đến nội dung video và các xu hướng hiện tại.
+- **ĐA DẠNG**: Gợi ý ít nhất 5 hashtags.
+- **TIẾNG VIỆT**: Caption và hashtags ưu tiên tiếng Việt, có thể kết hợp tiếng Anh nếu phù hợp với xu hướng.`,
+        variables: ['videoDescription']
     }
 };
 

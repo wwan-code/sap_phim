@@ -1,5 +1,5 @@
-@use '../_variables' as *;
-@use '../_mixins' as *;
+@use '../variables' as *;
+@use '../mixins' as *;
 
 // Keyframe animation cho shimmer effect
 @keyframes shimmer {
@@ -23,10 +23,6 @@
     background-size: 200px 100%;
     animation: shimmer 1.5s infinite linear;
     border-radius: $border-radius;
-}
-
-.skeleton-shimmer {
-    @include skeleton-shimmer();
 }
 
 .movie-card-skeleton {

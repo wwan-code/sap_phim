@@ -2,9 +2,9 @@ import db from '../models/index.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { Op } from 'sequelize'; // Import Op
+import { Op } from 'sequelize';
 
-const { User, Role } = db;
+const { User, Role, Friendship } = db;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,11 +106,34 @@ const updateUserCover = async (userId, coverUrl) => {
 };
 
 /**
- * @desc Lấy thông tin người dùng theo UUID
+ * @desc Kiểm tra xem viewer có phải là bạn bè của user không
+ * @param {number} userId - ID của user
+ * @param {number} viewerId - ID của viewer
+ * @returns {Promise<boolean>}
+ */
+const checkIsFriend = async (userId, viewerId) => {
+  if (!viewerId || userId === viewerId) return false;
+  
+  const friendship = await Friendship.findOne({
+    where: {
+      [Op.or]: [
+        { senderId: userId, receiverId: viewerId },
+        { senderId: viewerId, receiverId: userId },
+      ],
+      status: 'accepted',
+    },
+  });
+  
+  return !!friendship;
+};
+
+/**
+ * @desc Lấy thông tin người dùng theo UUID với privacy check
  * @param {string} uuid - UUID của người dùng
+ * @param {number} viewerId - ID người xem (optional)
  * @returns {Promise<User>} Đối tượng người dùng
  */
-const getUserByUuid = async (uuid) => {
+const getUserByUuid = async (uuid, viewerId = null) => {
   const user = await User.findOne({
     where: { uuid },
     include: [
@@ -118,68 +141,170 @@ const getUserByUuid = async (uuid) => {
         model: Role, 
         as: 'roles', 
         attributes: ['name'] 
-      }
+      },
     ],
-    attributes: { exclude: ['password', 'updatedAt', 'deletedAt', 'provider'], include: ['online', 'lastOnline'] },
+    attributes: { 
+      exclude: ['password', 'updatedAt', 'deletedAt', 'provider', 'notificationSettings'], 
+      include: ['online', 'lastOnline', 'profileVisibility', 'showOnlineStatus'] 
+    },
   });
 
   if (!user) {
     throw new Error('Người dùng không tồn tại.');
   }
 
-  return user;
+  const isOwner = viewerId && user.id === viewerId;
+  const isFriend = await checkIsFriend(user.id, viewerId);
+
+  // Check profile visibility
+  if (!isOwner) {
+    if (user.profileVisibility === 'private') {
+      throw new Error('Hồ sơ này ở chế độ riêng tư.');
+    }
+    if (user.profileVisibility === 'friends' && !isFriend) {
+      throw new Error('Chỉ bạn bè mới có thể xem hồ sơ này.');
+    }
+  }
+
+  // Hide online status if setting is off
+  const userData = user.get({ plain: true });
+  if (!isOwner && !user.showOnlineStatus) {
+    userData.online = false;
+    userData.lastOnline = null;
+  }
+
+  return userData;
 };
 
 /**
- * @desc Lấy danh sách bạn bè của người dùng theo UUID
+ * @desc Lấy danh sách bạn bè của người dùng theo UUID với pagination
  * @param {string} uuid - UUID của người dùng
- * @returns {Promise<Array<User>>} Danh sách bạn bè
+ * @param {number} page - Số trang (default: 1)
+ * @param {number} limit - Số lượng items per page (default: 10)
+ * @param {number} viewerId - ID người xem (optional)
+ * @returns {Promise<Object>} Object chứa data và meta pagination
  */
-const getUserFriendsByUuid = async (uuid) => {
-  const user = await User.findOne({ where: { uuid } });
+const getUserFriendsByUuid = async (uuid, page = 1, limit = 10, viewerId = null) => {
+  try {
+    // Validate inputs
+    const validPage = Math.max(1, parseInt(page) || 1);
+    const validLimit = Math.min(50, Math.max(1, parseInt(limit) || 10));
+    const offset = (validPage - 1) * validLimit;
 
-  if (!user) {
-    throw new Error('Người dùng không tồn tại.');
-  }
+    // Find user by UUID
+    const user = await User.findOne({ 
+      where: { uuid },
+      attributes: ['id', 'uuid', 'username', 'showFriendList']
+    });
 
-  const friendships = await db.Friendship.findAll({
-    where: {
+    if (!user) {
+      throw new Error('Người dùng không tồn tại.');
+    }
+
+    const isOwner = viewerId && user.id === viewerId;
+    const isFriend = await checkIsFriend(user.id, viewerId);
+
+    // Check friend list visibility
+    if (!isOwner) {
+      if (user.showFriendList === 'private') {
+        throw new Error('Danh sách bạn bè này ở chế độ riêng tư.');
+      }
+      if (user.showFriendList === 'friends' && !isFriend) {
+        throw new Error('Chỉ bạn bè mới có thể xem danh sách bạn bè này.');
+      }
+    }
+
+    // Build where condition
+    const whereCondition = {
       [Op.or]: [{ senderId: user.id }, { receiverId: user.id }],
       status: 'accepted',
-    },
-    include: [
-      {
-        model: User,
-        as: 'sender',
-        attributes: ['id', 'uuid', 'username', 'avatarUrl', 'online', 'lastOnline'],
-      },
-      {
-        model: User,
-        as: 'receiver',
-        attributes: ['id', 'uuid', 'username', 'avatarUrl', 'online', 'lastOnline'],
-      },
-    ],
-  });
+    };
 
-  const friends = friendships.map((f) => {
-    return f.senderId === user.id ? f.receiver : f.sender;
-  });
+    // Count total friends
+    const totalFriends = await db.Friendship.count({ where: whereCondition });
 
-  return friends;
+    // Fetch friendships with pagination
+    const friendships = await db.Friendship.findAll({
+      where: whereCondition,
+      include: [
+        {
+          model: User,
+          as: 'sender',
+          attributes: ['id', 'uuid', 'username', 'avatarUrl', 'online', 'lastOnline', 'showOnlineStatus'],
+        },
+        {
+          model: User,
+          as: 'receiver',
+          attributes: ['id', 'uuid', 'username', 'avatarUrl', 'online', 'lastOnline', 'showOnlineStatus'],
+        },
+      ],
+      limit: validLimit,
+      offset: offset,
+      order: [['createdAt', 'DESC']],
+    });
+
+    // Extract friend info and respect online status privacy
+    const friends = friendships.map((f) => {
+      const friend = f.senderId === user.id ? f.receiver : f.sender;
+      const friendData = friend.get({ plain: true });
+      
+      // Hide online status if user has disabled it
+      if (!friend.showOnlineStatus) {
+        friendData.online = false;
+        friendData.lastOnline = null;
+      }
+      
+      delete friendData.showOnlineStatus;
+      return friendData;
+    });
+
+    const totalPages = Math.ceil(totalFriends / validLimit);
+
+    return {
+      data: friends,
+      meta: {
+        page: validPage,
+        limit: validLimit,
+        total: totalFriends,
+        totalPages: totalPages,
+        hasMore: validPage < totalPages,
+      },
+    };
+  } catch (error) {
+    console.error('Error in getUserFriendsByUuid:', error);
+    throw error;
+  }
 };
 
 /**
- * @desc Lấy danh sách phim yêu thích của người dùng theo UUID
+ * @desc Lấy danh sách phim yêu thích của người dùng theo UUID với privacy check
  * @param {string} uuid - UUID của người dùng
  * @param {number} page - Trang hiện tại
  * @param {number} limit - Số lượng item mỗi trang
+ * @param {number} viewerId - ID người xem (optional)
  * @returns {Promise<object>} Danh sách phim yêu thích với phân trang
  */
-const getUserFavoritesByUuid = async (uuid, page = 1, limit = 10) => {
-  const user = await User.findOne({ where: { uuid } });
+const getUserFavoritesByUuid = async (uuid, page = 1, limit = 10, viewerId = null) => {
+  const user = await User.findOne({ 
+    where: { uuid },
+    attributes: ['id', 'uuid', 'showFavorites']
+  });
   
   if (!user) {
     throw new Error('Người dùng không tồn tại.');
+  }
+
+  const isOwner = viewerId && user.id === viewerId;
+  const isFriend = await checkIsFriend(user.id, viewerId);
+
+  // Check favorites visibility
+  if (!isOwner) {
+    if (user.showFavorites === 'private') {
+      throw new Error('Danh sách phim yêu thích này ở chế độ riêng tư.');
+    }
+    if (user.showFavorites === 'friends' && !isFriend) {
+      throw new Error('Chỉ bạn bè mới có thể xem danh sách phim yêu thích này.');
+    }
   }
 
   const offset = (page - 1) * limit;
@@ -213,17 +338,34 @@ const getUserFavoritesByUuid = async (uuid, page = 1, limit = 10) => {
 };
 
 /**
- * @desc Lấy lịch sử xem phim của người dùng theo UUID
+ * @desc Lấy lịch sử xem phim của người dùng theo UUID với privacy check
  * @param {string} uuid - UUID của người dùng
  * @param {number} page - Trang hiện tại
  * @param {number} limit - Số lượng item mỗi trang
+ * @param {number} viewerId - ID người xem (optional)
  * @returns {Promise<object>} Lịch sử xem phim với phân trang
  */
-const getUserWatchHistoryByUuid = async (uuid, page = 1, limit = 10) => {
-  const user = await User.findOne({ where: { uuid } });
+const getUserWatchHistoryByUuid = async (uuid, page = 1, limit = 10, viewerId = null) => {
+  const user = await User.findOne({ 
+    where: { uuid },
+    attributes: ['id', 'uuid', 'showWatchHistory']
+  });
   
   if (!user) {
     throw new Error('Người dùng không tồn tại.');
+  }
+
+  const isOwner = viewerId && user.id === viewerId;
+  const isFriend = await checkIsFriend(user.id, viewerId);
+
+  // Check watch history visibility
+  if (!isOwner) {
+    if (user.showWatchHistory === 'private') {
+      throw new Error('Lịch sử xem phim này ở chế độ riêng tư.');
+    }
+    if (user.showWatchHistory === 'friends' && !isFriend) {
+      throw new Error('Chỉ bạn bè mới có thể xem lịch sử xem phim này.');
+    }
   }
 
   const offset = (page - 1) * limit;
@@ -264,7 +406,6 @@ const getUserWatchHistoryByUuid = async (uuid, page = 1, limit = 10) => {
   };
 };
 
-export { updateUserProfile, updateUserAvatar, updateUserCover, getUserByUuid, getUserFavoritesByUuid, getUserWatchHistoryByUuid, getUserFriendsByUuid };
 /**
  * @desc Tìm kiếm người dùng theo username (phục vụ mention)
  * @param {string} query - Từ khóa tìm kiếm
@@ -287,8 +428,6 @@ const searchUsers = async (query, limit = 10) => {
   return users;
 };
 
-export { searchUsers };
-
 /**
  * @desc Tìm kiếm bạn bè của người dùng theo username
  * @param {number} userId - ID người dùng hiện tại
@@ -305,8 +444,8 @@ const searchFriendsByUserId = async (userId, query, limit = 10) => {
       status: 'accepted',
     },
     include: [
-      { model: User, as: 'sender', attributes: ['id', 'uuid', 'username', 'avatarUrl'] },
-      { model: User, as: 'receiver', attributes: ['id', 'uuid', 'username', 'avatarUrl'] },
+      { model: User, as: 'sender', attributes: ['id', 'uuid', 'username', 'avatarUrl', 'online', 'lastOnline'] },
+      { model: User, as: 'receiver', attributes: ['id', 'uuid', 'username', 'avatarUrl', 'online', 'lastOnline'] },
     ],
   });
 
@@ -325,4 +464,4 @@ const searchFriendsByUserId = async (userId, query, limit = 10) => {
   return Array.from(uniqueById.values()).slice(0, limit);
 };
 
-export { searchFriendsByUserId };
+export { updateUserProfile, updateUserAvatar, updateUserCover, getUserByUuid, getUserFavoritesByUuid, getUserWatchHistoryByUuid, getUserFriendsByUuid, searchUsers, searchFriendsByUserId };

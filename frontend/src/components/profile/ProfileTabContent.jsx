@@ -1,5 +1,5 @@
 import React from 'react';
-import SettingsTab from './tabs/SettingsTab';
+import EditProfileTab from './tabs/EditProfileTab';
 import FriendsTab from './tabs/FriendsTab';
 import HistoryTab from './tabs/HistoryTab';
 import FavoritesTab from './tabs/FavoritesTab';
@@ -13,8 +13,8 @@ const ProfileTabContent = ({ activeTab, user, isOwnProfile = true }) => {
         return <FriendsTab user={user} isOwnProfile={isOwnProfile} />;
       case 'history':
         return <HistoryTab user={user} isOwnProfile={isOwnProfile} />;
-      case 'settings':
-        return <SettingsTab />;
+      case 'edit-profile':
+        return <EditProfileTab />;
       default:
         return null;
     }

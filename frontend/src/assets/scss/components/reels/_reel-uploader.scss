@@ -1,0 +1,106 @@
+@use '../../variables' as *;
+@use '../../mixins' as *;
+
+.reel-uploader {
+  padding: var(--w-spacing-md);
+  background-color: var(--w-background-color-light);
+  border-radius: var(--w-border-radius-md);
+  color: var(--w-text-color);
+
+  &__title {
+    font-size: var(--w-font-size-lg);
+    margin-bottom: var(--w-spacing-md);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--w-spacing-md);
+  }
+
+  &__dropzone {
+    border: 2px dashed var(--w-border-color);
+    border-radius: var(--w-border-radius-sm);
+    padding: var(--w-spacing-lg);
+    text-align: center;
+    cursor: pointer;
+    @include transition-ease();
+
+    &:hover, &.dragging {
+      border-color: var(--w-primary-color);
+      background-color: var(--w-background-color-dark);
+    }
+
+    p {
+      margin: 0;
+      color: var(--w-text-color-light);
+    }
+  }
+
+  &__preview {
+    margin-top: var(--w-spacing-md);
+    
+    video {
+      max-width: 100%;
+      border-radius: var(--w-border-radius-sm);
+    }
+  }
+
+  &__progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--w-border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: var(--w-spacing-sm);
+
+    &-fill {
+      height: 100%;
+      background-color: var(--w-primary-color);
+      @include transition-ease(0.5s, width);
+    }
+  }
+
+  &__input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--w-spacing-xs);
+
+    label {
+      font-weight: var(--w-font-weight-medium);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: var(--w-spacing-sm);
+      border: 1px solid var(--w-border-color);
+      border-radius: var(--w-border-radius-sm);
+      background-color: var(--w-input-bg);
+      color: var(--w-text-color);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+  }
+
+  &__ai-suggest {
+    display: flex;
+    align-items: center;
+    gap: var(--w-spacing-sm);
+
+    button {
+      @include button-style(var(--w-info-color));
+      padding: var(--w-spacing-xs) var(--w-spacing-sm);
+      font-size: var(--w-font-size-sm);
+    }
+  }
+
+  &__submit-btn {
+    @include button-style(var(--w-primary-color));
+    width: 100%;
+    font-size: var(--w-font-size-md);
+    font-weight: var(--w-font-weight-bold);
+  }
+}

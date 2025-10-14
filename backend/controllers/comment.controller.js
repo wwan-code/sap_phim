@@ -296,7 +296,7 @@ const hideComment = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Xóa bình luận với quyền admin
+ * @desc    Xóa bình luận (Admin)
  * @route   DELETE /api/comments/:id/admin
  * @access  Private/Admin
  */
@@ -308,6 +308,23 @@ const adminDeleteComment = asyncHandler(async (req, res) => {
     res.status(200).json({
         success: true,
         message: 'Bình luận đã được xóa bởi admin thành công.',
+    });
+});
+
+/**
+ * @desc    Lấy comment cụ thể và parent chain
+ * @route   GET /api/comments/:id/with-parents
+ * @access  Public
+ */
+const getCommentWithParents = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user ? req.user.id : null;
+
+    const result = await commentService.getCommentWithParents(parseInt(id), userId);
+
+    res.status(200).json({
+        success: true,
+        data: result,
     });
 });
 
@@ -326,4 +343,5 @@ export {
     pinComment,
     hideComment,
     adminDeleteComment,
+    getCommentWithParents,
 };

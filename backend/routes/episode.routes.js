@@ -15,12 +15,7 @@ movieRouter.get('/', episodeController.getEpisodesOfMovie);
 // @route   POST /api/movies/:movieId/episodes
 // @desc    Tạo tập phim mới cho một phim
 // @access  Private/Admin
-movieRouter.post(
-  '/',
-  verifyToken,
-  authorizeRoles('admin'),
-  episodeController.createEpisode
-);
+movieRouter.post('/', verifyToken, authorizeRoles('admin'), episodeController.createEpisode);
 
 // @route   PUT /api/episodes/all
 // @desc    Lấy tất cả các tập phim (không phân trang)
@@ -41,22 +36,12 @@ router.get('/episodes/:id', episodeController.getEpisodeById);
 // @route   PUT /api/episodes/:id
 // @desc    Cập nhật một tập phim
 // @access  Private/Admin
-router.put(
-  '/episodes/:id',
-  verifyToken,
-  authorizeRoles('admin'),
-  episodeController.updateEpisode
-);
+router.put('/episodes/:id', verifyToken, authorizeRoles('admin'), episodeController.updateEpisode);
 
 // @route   DELETE /api/episodes/:id
 // @desc    Xóa một tập phim
 // @access  Private/Admin
-router.delete(
-  '/episodes/:id',
-  verifyToken,
-  authorizeRoles('admin'),
-  episodeController.deleteEpisode
-);
+router.delete('/episodes/:id', verifyToken, authorizeRoles('admin'), episodeController.deleteEpisode);
 
 // Gắn router con vào router chính
 router.use('/movies/:movieId/episodes', movieRouter);

@@ -2,12 +2,9 @@
 @use '../mixins' as *;
 
 .card-section {
-    padding: var(--w-spacing-md) var(--w-spacing-xxl);
-    max-width: 1640px;
+    padding: 0 var(--w-spacing-xxl);
+    max-width: var(--w-max-width);
     margin: 0 auto;
-    @include breakpoint(tablet-and-below) {
-        padding: var(--w-spacing-md) var(--w-spacing-lg);
-      }
 
     .section-title {
         @include flex(row, space-between, center);

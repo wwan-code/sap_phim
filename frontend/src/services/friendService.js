@@ -1,15 +1,38 @@
 import api from './api';
 
-const getFriends = () => {
-  return api.get('/friends');
+/**
+ * Lấy danh sách bạn bè với pagination
+ * @param {Object} params - { page, limit, q }
+ * @returns {Promise}
+ */
+const getFriends = (params = {}) => {
+  const { page = 1, limit = 10, q } = params;
+  const queryParams = new URLSearchParams();
+  queryParams.append('page', page);
+  queryParams.append('limit', limit);
+  if (q) queryParams.append('q', q);
+  
+  return api.get(`/friends?${queryParams.toString()}`);
 };
 
-const getPendingRequests = () => {
-  return api.get('/friends/pending');
+/**
+ * Lấy danh sách lời mời đang chờ với pagination
+ * @param {Object} params - { page, limit }
+ * @returns {Promise}
+ */
+const getPendingRequests = (params = {}) => {
+  const { page = 1, limit = 10 } = params;
+  return api.get(`/friends/pending?page=${page}&limit=${limit}`);
 };
 
-const getSentRequests = () => {
-  return api.get('/friends/sent');
+/**
+ * Lấy danh sách lời mời đã gửi với pagination
+ * @param {Object} params - { page, limit }
+ * @returns {Promise}
+ */
+const getSentRequests = (params = {}) => {
+  const { page = 1, limit = 10 } = params;
+  return api.get(`/friends/sent?page=${page}&limit=${limit}`);
 };
 
 const sendRequest = (userId) => {
@@ -28,8 +51,15 @@ const removeFriend = (friendId) => {
   return api.delete(`/friends/remove/${friendId}`);
 };
 
-const searchUsers = (query) => {
-  return api.get(`/friends/search?query=${query}`);
+/**
+ * Tìm kiếm người dùng với pagination
+ * @param {string} query - Search query
+ * @param {Object} params - { limit, offset }
+ * @returns {Promise}
+ */
+const searchUsers = (query, params = {}) => {
+  const { limit = 10, offset = 0 } = params;
+  return api.get(`/friends/search?query=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`);
 };
 
 const friendService = {

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import '@/assets/scss/components/_loader.scss';
+import '@/assets/scss/components/common/_loader.scss';
 
 const Loader = () => {
   return ReactDOM.createPortal(

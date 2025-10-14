@@ -2,26 +2,76 @@
 
 // Mixin cho responsive breakpoints
 @mixin breakpoint($point) {
-  @if $point == xs {
-    @media (max-width: 575.98px) { @content; }
-  } @else if $point == sm {
-    @media (min-width: 576px) and (max-width: 767.98px) { @content; }
-  } @else if $point == md {
-    @media (min-width: 768px) and (max-width: 991.98px) { @content; }
-  } @else if $point == lg {
-    @media (min-width: 992px) and (max-width: 1199.98px) { @content; }
-  } @else if $point == xl {
-    @media (min-width: 1200px) { @content; }
-  } @else if $point == mobile {
-    @media (max-width: 767.98px) { @content; }
-  } @else if $point == tablet {
-    @media (min-width: 768px) and (max-width: 991.98px) { @content; }
-  } @else if $point == desktop {
-    @media (min-width: 992px) { @content; }
-  } @else if $point == tablet-and-below {
-    @media (max-width: 991.98px) { @content; }
-  } @else if $point == desktop-and-above {
-    @media (min-width: 992px) { @content; }
+  @if $point ==xs {
+    @media (max-width: 575.98px) {
+      @content;
+    }
+  }
+
+  @else if $point ==sm {
+    @media (min-width: 576px) and (max-width: 767.98px) {
+      @content;
+    }
+  }
+
+  @else if $point ==md {
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      @content;
+    }
+  }
+
+  @else if $point ==lg {
+    @media (min-width: 992px) and (max-width: 1199.98px) {
+      @content;
+    }
+  }
+
+  @else if $point ==xl {
+    @media (min-width: 1200px) and (max-width: 1399.98px) {
+      @content;
+    }
+  }
+
+  @else if $point ==xxl {
+    @media (min-width: 1400px) {
+      @content;
+    }
+  }
+
+  @else if $point ==tv {
+    @media (min-width: 1920px) {
+      @content;
+    }
+  }
+
+  @else if $point ==mobile {
+    @media (max-width: 767.98px) {
+      @content;
+    }
+  }
+
+  @else if $point ==tablet {
+    @media (min-width: 768px) and (max-width: 991.98px) {
+      @content;
+    }
+  }
+
+  @else if $point ==desktop {
+    @media (min-width: 992px) {
+      @content;
+    }
+  }
+
+  @else if $point ==tablet-and-below {
+    @media (max-width: 991.98px) {
+      @content;
+    }
+  }
+
+  @else if $point ==desktop-and-above {
+    @media (min-width: 992px) {
+      @content;
+    }
   }
 }
 
@@ -59,11 +109,13 @@
 
 // Mixin cho text truncation (ellipsis)
 @mixin text-truncate($lines: 1) {
-  @if $lines == 1 {
+  @if $lines ==1 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  } @else {
+  }
+
+  @else {
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: $lines;
@@ -73,21 +125,40 @@
 
 // Mixin cho shadow
 @mixin shadow($level: md) {
-  @if $level == sm {
-    box-shadow: var(--w-box-shadow);
-  } @else if $level == md {
+  @if $level ==sm {
+    box-shadow: var(--w-box-shadow-sm);
+  }
+
+  @else if $level ==md {
+    box-shadow: var(--w-box-shadow-md);
+  }
+
+  @else if $level ==lg {
     box-shadow: var(--w-box-shadow-lg);
-  } @else if $level == none {
-    box-shadow: none;
+  }
+
+  @else if $level ==none {
+    box-shadow: var(--w-box-shadow);
   }
 }
 
 // Mixin cho placeholder text
 @mixin placeholder {
-  &::-webkit-input-placeholder { @content; }
-  &:-moz-placeholder { @content; }
-  &::-moz-placeholder { @content; }
-  &:-ms-input-placeholder { @content; }
+  &::-webkit-input-placeholder {
+    @content;
+  }
+
+  &:-moz-placeholder {
+    @content;
+  }
+
+  &::-moz-placeholder {
+    @content;
+  }
+
+  &:-ms-input-placeholder {
+    @content;
+  }
 }
 
 // Mixin cho card-like elements
@@ -103,12 +174,44 @@
   transition: $property $duration ease-in-out;
 }
 
+// Mixin cho shimmer animation
+@mixin shimmer-animation {
+  background: linear-gradient(90deg, var(--w-background-color-light) 25%, var(--w-border-color-dark) 50%, var(--w-background-color-light) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
 // Keyframes cho skeleton loading animation
 @keyframes pulse-bg {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+// Mixin cho focus management
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid var(--w-primary-color);
+    outline-offset: 2px;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 }

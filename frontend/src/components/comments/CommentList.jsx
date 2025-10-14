@@ -6,6 +6,7 @@ import CommentError from './CommentError';
 import { useReplies } from '@/hooks/useCommentQueries';
 import useCommentStore from '@/stores/useCommentStore';
 import classNames from '@/utils/classNames';
+
 /**
  * Component CommentList để hiển thị danh sách các bình luận hoặc replies.
  * Hỗ trợ hiển thị đa cấp, lazy load replies và pagination cho replies.
@@ -102,7 +103,7 @@ const RepliesLoader = ({
         isError,
         error,
         refetch,
-    } = useReplies(parentId, 'latest'); // Replies always sorted by latest for now
+    } = useReplies(parentId, 'latest'); 
 
     const allReplies = data?.pages.flatMap((page) => page.data) || [];
 

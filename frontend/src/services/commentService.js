@@ -260,6 +260,20 @@ async function searchComments(params) {
   }
 }
 
+/**
+ * @desc Lấy thông tin comment cụ thể và parent chain
+ * @param {number} commentId - ID của comment
+ * @returns {Promise<object>} Dữ liệu comment và parent IDs
+ */
+async function getCommentWithParents(commentId) {
+  try {
+    const response = await api.get(`${BASE_URL}/${commentId}/with-parents`);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+}
+
 const commentService = {
   getReplies,
   getComments,
@@ -278,6 +292,7 @@ const commentService = {
   canReplyToComment,
   getCommentStats,
   searchComments,
+  getCommentWithParents,
 };
 
 export default commentService;

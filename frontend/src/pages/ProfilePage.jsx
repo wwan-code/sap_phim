@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import Loader from '@/components/common/Loader';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
-import ProfileTabs from '@/components/profile/ProfileTabs';
 import ProfileTabContent from '@/components/profile/ProfileTabContent';
 import userService from '@/services/userService';
 import '@/assets/scss/pages/_profile-page.scss';
@@ -43,7 +42,6 @@ const ProfilePage = () => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Không thể tải thông tin người dùng';
       setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -51,19 +49,22 @@ const ProfilePage = () => {
 
   // Loading state
   if (authLoading || loading) {
-    return <Loader />;
+    return <LoadingSpinner fullscreen label="Đang tải hồ sơ..." />;
   }
 
   // Error state
   if (authError || error) {
     const errorMessage = authError?.message || error || 'Đã xảy ra lỗi khi tải trang hồ sơ.';
-    toast.error(errorMessage);
+    const retryAction = uuid && uuid !== currentUser?.uuid ? () => loadUserProfile(uuid) : undefined;
+
     return (
-      <div className="profile-page container">
-        <div className="error-message">
-          <h2>Không thể tải trang hồ sơ</h2>
-          <p>{errorMessage}</p>
-        </div>
+      <div className="container-fluid page-container">
+        <ErrorMessage 
+          variant="card"
+          title="Không thể tải trang hồ sơ" 
+          message={errorMessage} 
+          onRetry={retryAction}
+        />
       </div>
     );
   }
@@ -71,26 +72,23 @@ const ProfilePage = () => {
   // Không có user data
   if (!targetUser) {
     return (
-      <div className="profile-page container">
-        <div className="error-message">
-          <h2>Người dùng không tồn tại</h2>
-          <p>Không tìm thấy thông tin người dùng.</p>
-        </div>
+      <div className="container-fluid page-container">
+        <ErrorMessage 
+          variant="card"
+          title="Người dùng không tồn tại" 
+          message="Không tìm thấy thông tin người dùng bạn đang tìm kiếm." 
+        />
       </div>
     );
   }
 
   return (
-    <div className="profile-page container">
+    <div className="profile-page">
       <div className="profile-page__sidebar">
-        <ProfileSidebar user={targetUser} isOwnProfile={isViewingOwnProfile} />
+        <ProfileSidebar user={targetUser} activeTab={activeTab} setActiveTab={setActiveTab} isOwnProfile={isViewingOwnProfile} />
       </div>
       <main className="profile-page__main">
-        <ProfileTabs 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          isOwnProfile={isViewingOwnProfile}
-        />
+        
         <ProfileTabContent 
           activeTab={activeTab} 
           user={targetUser}

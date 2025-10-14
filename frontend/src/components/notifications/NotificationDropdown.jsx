@@ -69,14 +69,12 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
     }
   };
 
-  const isMobile = deviceType !== 'desktop';
-
   return (
     <div
       ref={containerRef}
       className={classNames('notification-dropdown', {
         'notification-dropdown--open': isOpen,
-        'notification-dropdown--mobile': isMobile,
+        'notification-dropdown--mobile': deviceType === 'mobile',
       })}
       role="dialog"
       aria-modal="true"

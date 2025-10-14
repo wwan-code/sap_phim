@@ -9,8 +9,10 @@ import SearchBar from '@/components/search/SearchBar';
 import NotificationDropdown from '../notifications/NotificationDropdown';
 import { useNotificationQueries } from '@/hooks/useNotificationQueries';
 import { useNotificationStore } from '@/stores/notificationStore';
-import { useDropdown } from '@/hooks/useDropdown'; // Vẫn giữ lại cho user menu
+import { useDropdown } from '@/hooks/useDropdown';
 import '@/assets/scss/components/layout/_header.scss';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
+import { useTheme } from '@/hooks/useTheme';
 
 const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
@@ -19,17 +21,15 @@ const Header = ({ toggleSidebar }) => {
   const deviceType = useDeviceType();
   const { openAuthPopup } = useContext(AuthPopupContext);
 
-  // State & Hooks mới cho Notification
   const { unreadCount } = useNotificationQueries();
   const { isDropdownOpen, toggleDropdown, closeDropdown } = useNotificationStore();
 
-  // Hook dropdown cũ chỉ dùng cho User Menu
   const { isOpen: isUserMenuOpen, toggle: toggleUserMenu, getTriggerProps, getDropdownProps } = useDropdown();
 
   const [isHeaderFixed, setIsHeaderFixed] = useState(false);
 
   const handleScroll = () => {
-    if (window.scrollY > 0) { // Adjust scroll threshold as needed
+    if (window.scrollY > 0) {
       setIsHeaderFixed(true);
     } else {
       setIsHeaderFixed(false);
@@ -46,6 +46,12 @@ const Header = ({ toggleSidebar }) => {
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
+  };
+
+  const { theme, toggleTheme } = useTheme();
+
+  const handleToggleTheme = () => {
+    toggleTheme();
   };
 
   return (
@@ -78,16 +84,10 @@ const Header = ({ toggleSidebar }) => {
               <NavLink to="/">Trang chủ</NavLink>
             </li>
             <li>
-              <NavLink to="/movies">Phim</NavLink>
+              <NavLink to="/chat">
+                <i className="fas fa-comment-dots"></i> Chat
+              </NavLink>
             </li>
-            <li>
-              <NavLink to="/friends">Bạn bè</NavLink>
-            </li>
-            {user && (
-              <li>
-                <NavLink to="/watchlist">Danh sách xem</NavLink>
-              </li>
-            )}
           </ul>
         </nav>
         )}
@@ -103,12 +103,14 @@ const Header = ({ toggleSidebar }) => {
                 aria-expanded={isDropdownOpen}
                 aria-label={`Thông báo, ${unreadCount} chưa đọc`}
               >
-                <i className="fas fa-bell"></i>
-                {unreadCount > 0 && (
-                  <span className="header__notification-badge">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
+                <div className="header__notification-btn-wrapper">
+                  <i className="fas fa-bell"></i>
+                  {unreadCount > 0 && (
+                    <span className="header__notification-badge">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </div>
               </button>
               <NotificationDropdown isOpen={isDropdownOpen} onClose={closeDropdown} />
             </div>
@@ -120,7 +122,7 @@ const Header = ({ toggleSidebar }) => {
                 {...getTriggerProps('header-user-menu')}
               >
                 <img
-                  src={user?.avatarUrl ? `${import.meta.env.VITE_SERVER_URL}${user.avatarUrl}` : 'https://placehold.co/40?text=User'}
+                  src={getAvatarUrl(user)}
                   alt="User Avatar"
                   className="header__user-menu-avatar"
                 />
@@ -138,8 +140,8 @@ const Header = ({ toggleSidebar }) => {
                     </Link>
                   </li>
                   <li role="none">
-                    <Link role="menuitem" to="/notifications" onClick={() => toggleUserMenu('header-user-menu')}>
-                      <i className="fas fa-bell"></i> Thông báo
+                    <Link role="menuitem" to="/settings" onClick={() => toggleUserMenu('header-user-menu')}>
+                      <i className="fas fa-cog"></i> Cài đặt
                     </Link>
                   </li>
                   {user && user.roles && (user.roles.find(role => role.name === 'admin' || role.name === 'editor')) && (
@@ -149,6 +151,21 @@ const Header = ({ toggleSidebar }) => {
                       </Link>
                     </li>
                   )}
+                  <li role="none">
+                    <button role="menuitem" onClick={handleToggleTheme}>
+                      {
+                        theme === 'light' ? (
+                          <>
+                            <i className='fas fa-moon'></i> Giao diện tối
+                          </>
+                        ) : (
+                          <>
+                            <i className='fas fa-sun'></i> Giao diện sáng
+                          </>
+                        )
+                      }
+                    </button>
+                  </li>
                   <li role="none">
                     <button role="menuitem" onClick={handleLogout}>
                       <i className="fas fa-sign-out-alt"></i> Đăng xuất

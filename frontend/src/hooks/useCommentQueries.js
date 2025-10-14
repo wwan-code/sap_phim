@@ -9,8 +9,8 @@ const COMMENT_QUERY_KEYS = {
     comments: (contentType, contentId, sort) => ['comments', contentType, contentId, sort],
     movieCommentsWithEpisodes: (movieId, sort) => ['movieCommentsWithEpisodes', movieId, sort],
     replies: (parentId, sort) => ['replies', parentId, sort],
-    reportedComments: (filters) => ['reportedComments', filters], // New key for reported comments
-    commentStatsAdmin: (filters) => ['commentStatsAdmin', filters], // New key for admin comment stats
+    reportedComments: (filters) => ['reportedComments', filters],
+    commentStatsAdmin: (filters) => ['commentStatsAdmin', filters],
 };
 
 /**
@@ -329,15 +329,14 @@ export const useToggleLike = (queryKeyToInvalidate, currentUserId) => {
                 comments.map(comment => {
                     if (comment.id === commentId) {
                         const isLiked = !comment.isLiked;
-                        const likes = isLiked
-                            ? [...(comment.likes || []), currentUserId]
-                            : (comment.likes || []).filter(id => id !== currentUserId);
-                        return {
-                            ...comment,
-                            isLiked,
-                            likes,
-                            likesCount: likes.length,
-                        };
+                            const newLikesCount = isLiked
+                                ? (comment.likesCount || 0) + 1
+                                : (comment.likesCount || 0) - 1;
+                            return {
+                                ...comment,
+                                isLiked,
+                                likesCount: newLikesCount < 0 ? 0 : newLikesCount, // Ensure likes don't go below 0
+                            };
                     }
                     // Cập nhật trong nested replies
                     if (comment.replies && comment.replies.length > 0) {
@@ -352,6 +351,7 @@ export const useToggleLike = (queryKeyToInvalidate, currentUserId) => {
             // Cập nhật cho query hiện tại
             queryClient.setQueryData(queryKeyToInvalidate, (oldData) => {
                 if (!oldData) return oldData;
+                console.log("oldData", oldData)
 
                 return {
                     ...oldData,
@@ -652,6 +652,24 @@ export const useHideComment = (queryKeyToInvalidate) => {
                 queryClient.setQueryData(queryKeyToInvalidate, context.previousComments);
             }
         },
+    });
+};
+
+/**
+ * Custom hook để lấy comment với parent chain (for navigation)
+ * @param {number} commentId - ID của comment
+ * @returns {object} Kết quả từ useQuery
+ */
+export const useCommentWithParents = (commentId) => {
+    return useQuery({
+        queryKey: ['comment-with-parents', commentId],
+        queryFn: async () => {
+            const res = await commentService.getCommentWithParents(commentId);
+            return res.data;
+        },
+        enabled: !!commentId,
+        staleTime: 10 * 60 * 1000, // Cache 10 phút
+        gcTime: 30 * 60 * 1000, // Keep in cache 30 phút
     });
 };
 

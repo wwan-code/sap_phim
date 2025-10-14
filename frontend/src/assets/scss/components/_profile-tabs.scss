@@ -1,26 +1,40 @@
+@use '../variables' as *;
 @use '../mixins' as *;
 
 .profile-tabs {
-  margin-bottom: var(--w-spacing-lg);
 
   &__list {
     list-style: none;
     padding: 0;
     margin: 0;
-    @include flex(row, flex-start, center);
+    @include flex(column, flex-start, stretch);
     border-bottom: 2px solid var(--w-border-color);
     gap: var(--w-spacing-sm);
+
+    @include breakpoint(tablet) {
+      flex-direction: row;
+      gap: var(--w-spacing-md);
+    }
+
+    @include breakpoint(mobile) {
+      flex-direction: row;
+    }
   }
 
   &__item {
     padding: var(--w-spacing-sm) var(--w-spacing-md);
     cursor: pointer;
     position: relative;
-    @include flex(row, center, center);
+    @include flex(row, flex-start, stretch);
     gap: var(--w-spacing-sm);
     color: var(--w-text-color-light);
     font-weight: var(--w-font-weight-medium);
     transition: color 0.3s ease;
+
+    @include breakpoint(mobile) {
+      flex-direction: column;
+      gap: var(--w-spacing-xs);
+    }
 
     &::after {
       content: '';
@@ -56,9 +70,5 @@
 
   &__label {
     font-size: var(--w-font-size-md);
-
-    @include breakpoint(mobile) {
-      display: none; // Hide label on mobile, only show icon
-    }
   }
 }

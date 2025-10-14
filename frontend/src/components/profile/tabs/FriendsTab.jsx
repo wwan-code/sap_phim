@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import classNames from '@/utils/classNames';
+import { useFriendStore } from '@/stores/useFriendStore';
 import FriendList from '@/components/friends/FriendList';
 import FriendRequestList from '@/components/friends/FriendRequestList';
 import FriendSearch from '@/components/friends/FriendSearch';
 
 const FriendsTab = ({ user, isOwnProfile = true }) => {
-  const [activeSubTab, setActiveSubTab] = useState('friends-list');
+  const { activeTab, setActiveTab } = useFriendStore();
 
   // Chỉ hiển thị các tab quản lý bạn bè cho profile của chính mình
   const subTabs = isOwnProfile ? [
@@ -18,7 +19,7 @@ const FriendsTab = ({ user, isOwnProfile = true }) => {
   ];
 
   const renderSubTabContent = () => {
-    switch (activeSubTab) {
+    switch (activeTab) {
       case 'friends-list':
         return <FriendList user={user} isOwnProfile={isOwnProfile} />;
       case 'pending-requests':
@@ -39,8 +40,8 @@ const FriendsTab = ({ user, isOwnProfile = true }) => {
           {subTabs.map((tab) => (
             <li
               key={tab.id}
-              className={classNames('friends-tab__nav-item', { 'is-active': activeSubTab === tab.id })}
-              onClick={() => setActiveSubTab(tab.id)}
+              className={classNames('friends-tab__nav-item', { 'is-active': activeTab === tab.id })}
+              onClick={() => setActiveTab(tab.id)}
             >
               {tab.label}
             </li>

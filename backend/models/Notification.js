@@ -28,16 +28,15 @@ const Notification = sequelize.define('Notification', {
   // Loại thông báo để phân loại và hiển thị icon/hành động phù hợp
   type: {
     type: DataTypes.ENUM(
-      'new_comment',
-      'comment_report',
-      'system_message',
       'friend_request',
       'friend_request_status',
-      'user_mention',
+      'new_comment',
       'like_comment',
-      'new_follower',
-      'movie_update'
-      // Thêm các loại khác nếu cần
+      'user_mention',
+      'movie_update',
+      'system_message',
+      'comment_report',
+      'new_message'
     ),
     allowNull: false,
   },

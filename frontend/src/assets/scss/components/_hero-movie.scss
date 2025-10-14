@@ -1,5 +1,5 @@
-@use '../_variables' as *;
-@use '../_mixins' as *;
+@use '../variables' as *;
+@use '../mixins' as *;
 
 .hero-movie {
   position: relative;
@@ -7,6 +7,10 @@
   padding-top: 50%;
   aspect-ratio: 18 / 9;
   overflow: hidden;
+  top: calc((var(--w-header-height-desktop) + var(--w-spacing-xl)) * -1);
+  @include breakpoint(tablet-and-below) {
+    top: calc((var(--w-header-height-mobile) + var(--w-spacing-md)) * -1);
+  }
 
   &--loading {
     background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
@@ -110,7 +114,7 @@
     height: 100%;
     @include flex(row, space-between, center);
     gap: var(--w-spacing-xl);
-    padding: var(--w-spacing-xxl) var(--w-spacing-lg);
+    padding: var(--w-spacing-xxl) 0;
     padding-top: calc(var(--w-header-height-desktop) + var(--w-spacing-xl));
   }
 
@@ -118,21 +122,35 @@
     flex: 1;
     max-width: 600px;
     color: var(--w-text-color-inverted);
+    margin-left: calc(var(--w-spacing-xxl)*2);
 
+    @include breakpoint(xl) {
+      margin-left: var(--w-spacing-xxl);
+    }
     @include breakpoint(lg) {
-      margin-left: calc(var(--w-spacing-xxl)*2);
+      margin-left: var(--w-spacing-xxl);
+    }
+    @include breakpoint(tablet-and-below) {
+      margin-left: 0;
+      padding: 0 var(--w-spacing-xxl);
     }
   }
 
   &__info {
-    animation: fadeInUp 0.6s ease-out;
+    animation: slideInFromRight 0.5s ease-out;
   }
 
   &__title {
-    font-size: var(--w-font-size-h2);
+    font-size: var(--w-font-size-h1);
     font-weight: var(--w-font-weight-bold);
     margin-bottom: var(--w-spacing-lg);
     line-height: 1.2;
+    @include breakpoint(lg) {
+      font-size: var(--w-font-size-h2);
+    }
+    @include breakpoint(tablet-and-below) {
+      margin-bottom: var(--w-spacing-md);
+    }
   }
 
   &__meta {
@@ -140,6 +158,9 @@
     gap: var(--w-spacing-lg);
     margin-bottom: var(--w-spacing-lg);
     flex-wrap: wrap;
+    @include breakpoint(tablet-and-below) {
+      margin-bottom: var(--w-spacing-md);
+    }
   }
 
   &__classification {
@@ -256,11 +277,17 @@
       .touch-btn {
         height: 50px;
         min-width: 68px;
+        @include breakpoint(tablet-and-below)  {
+          height: 40px;
+          min-width: 56px;
+        }
         @include flex(column, center, center);
         padding: 0 .2rem;
         gap: .3rem;
         position: relative;
         color: #fff;
+        background-color: transparent;
+        border: none;
 
         &+.touch-btn {
           border-left: 2px solid var(--w-border-color);
@@ -279,6 +306,12 @@
           background-color: #ffffff05;
           width: auto;
         }
+
+        &.active {
+          color: var(--w-primary-color);
+          background-color: #ffffff05;
+          width: auto;
+        }
       }
 
       &:hover {
@@ -292,6 +325,10 @@
     @include flex(row, center, center);
     width: 70px;
     height: 70px;
+    @include breakpoint(tablet-and-below) {
+      width: 50px;
+      height: 50px;
+    }
     border-radius: 50%;
     flex-shrink: 0;
     display: flex;
@@ -317,8 +354,8 @@
   }
 
   &__right {
-    flex: 0 0 400px;
-    max-width: 400px;
+    flex: 0 0 380px;
+    max-width: 380px;
   }
 
   &__carousel {
@@ -391,23 +428,21 @@
   }
 
   &__card {
-    width: 180px;
+    width: 125px;
     cursor: pointer;
     transition: all 0.3s ease;
     border-radius: var(--w-border-radius-lg);
     overflow: hidden;
     background: rgba(0, 0, 0, 0.8);
-    border: 2px solid transparent;
     position: relative;
 
-    &:hover {
-      transform: translateY(-5px);
-      border-color: var(--w-primary-color);
+    &:not(.hero-movie__card--active):hover {
+      transform: scale(1.05);
     }
 
     &--active {
-      border-color: var(--w-danger-color);
       transform: scale(1.05);
+      border: 2px solid var(--w-primary-color);
     }
   }
 
@@ -429,7 +464,7 @@
     transition: transform 0.4s ease;
   }
 
-  &__card:hover &__card-image {
+  &:not(.hero-movie__card--active):hover &__card-image {
     transform: scale(1.05);
   }
 
@@ -464,100 +499,13 @@
     font-weight: var(--w-font-weight-medium);
   }
 
-  // Skeleton loading styles
-  &__skeleton {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
-  }
-
-  &__skeleton-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, #2c2c2c 25%, #3c3c3c 50%, #2c2c2c 75%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-  }
-
-  &__skeleton-content {
-    position: relative;
-    z-index: 2;
-    height: 100%;
-    @include flex(row, space-between, center);
-    gap: var(--w-spacing-xl);
-    padding: var(--w-spacing-xxl) var(--w-spacing-lg);
-  }
-
-  &__skeleton-text {
-    flex: 1;
-    max-width: 600px;
-    margin-left: calc(var(--w-spacing-xxl)*2);
-  }
-
-  &__skeleton-title {
-    height: 60px;
-    background: linear-gradient(90deg, #3c3c3c 25%, #4c4c4c 50%, #3c3c3c 75%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-    border-radius: var(--w-border-radius);
-    margin-bottom: var(--w-spacing-lg);
-  }
-
-  &__skeleton-meta {
-    height: 30px;
-    background: linear-gradient(90deg, #3c3c3c 25%, #4c4c4c 50%, #3c3c3c 75%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-    border-radius: var(--w-border-radius);
-    margin-bottom: var(--w-spacing-lg);
-    width: 60%;
-  }
-
-  &__skeleton-description {
-    height: 120px;
-    background: linear-gradient(90deg, #3c3c3c 25%, #4c4c4c 50%, #3c3c3c 75%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-    border-radius: var(--w-border-radius);
-    margin-bottom: var(--w-spacing-xl);
-  }
-
-  &__skeleton-button {
-    height: 50px;
-    background: linear-gradient(90deg, #3c3c3c 25%, #4c4c4c 50%, #3c3c3c 75%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-    border-radius: var(--w-border-radius-lg);
-    width: 200px;
-  }
-
-  &__skeleton-carousel {
-    flex: 0 0 300px;
-    max-width: 300px;
-    @include flex(row, center, center);
-    gap: var(--w-spacing-md);
-  }
-
-  &__skeleton-card {
-    width: 200px;
-    height: 320px;
-    background: linear-gradient(90deg, #3c3c3c 25%, #4c4c4c 50%, #3c3c3c 75%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-    border-radius: var(--w-border-radius-lg);
-  }
-
   // Responsive design
   @include breakpoint(tablet-and-below) {
     height: auto;
     min-height: 60vh;
 
     &__content {
-      @include flex(column, flex-start, center);
+      @include flex(column, flex-start, stretch);
       gap: var(--w-spacing-lg);
     }
 
@@ -569,8 +517,6 @@
       flex: none;
       width: 100%;
       position: absolute;
-      right: var(--w-spacing-lg);
-      bottom: var(--w-spacing-xxl);
     }
 
     &__carousel {
@@ -605,11 +551,13 @@
   // Tablet specific (768px - 991px)
   @include breakpoint(tablet) {
     &__card {
-      width: 80px;
+      width: 60px;
     }
 
     &__right {
       max-width: 500px;
+      right: var(--w-spacing-lg);
+      bottom: var(--w-spacing-xxl);
     }
 
     &__card-info {
@@ -628,12 +576,18 @@
       gap: var(--w-spacing-md);
     }
 
+    &__description {
+      display: none !important;
+    }
+
     &__card {
-      width: 60px;
+      width: 80px;
     }
 
     &__right {
-      max-width: 300px;
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto;
     }
 
     &__card-info {
@@ -641,37 +595,141 @@
     }
   }
 
+  // Extra small specific (<576px)
   @include breakpoint(xs) {
     &__card {
-      width: 50px;
+      width: 60px;
     }
 
     &__right {
-      position: relative;
-      bottom: 0;
+      max-width: 320px;
+      margin: 0 auto;
     }
   }
 }
 
+// Skeleton Loader Styles
+.hero-movie {
+  &__skeleton {
+    background-color: var(--w-background-color-light);
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--w-border-radius);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(var(--w-background-color-light-rgb), 0.2),
+        transparent
+      );
+      transform: translateX(-100%);
+      animation: skeleton-loading 1.5s infinite;
+    }
+
+    &--background {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+
+    &--title {
+      height: 40px;
+      width: 70%;
+      margin-bottom: var(--w-spacing-lg);
+      @include breakpoint(mobile) {
+        height: 32px;
+        width: 80%;
+      }
+    }
+
+    &--meta {
+      height: 24px;
+      width: 60px;
+    }
+
+    &--description {
+      height: 18px;
+      width: 100%;
+      margin-top: var(--w-spacing-lg);
+      margin-bottom: var(--w-spacing-sm);
+    }
+
+    &--description-short {
+      height: 18px;
+      width: 80%;
+      margin-bottom: var(--w-spacing-lg);
+    }
+
+    &--genres {
+      height: 20px;
+      width: 50%;
+      margin-bottom: var(--w-spacing-xl);
+    }
+
+    &--play-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      @include breakpoint(tablet-and-below) {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    &--touch-group {
+      width: 140px;
+      height: 50px;
+      border-radius: 30px;
+       @include breakpoint(tablet-and-below) {
+        height: 40px;
+        width: 120px;
+      }
+    }
+
+    &-carousel {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+    }
+
+    &-card {
+      width: 125px;
+      flex-shrink: 0;
+    }
+
+    &--card-poster {
+      width: 100%;
+      padding-top: 150%;
+      border-radius: var(--w-border-radius-lg);
+    }
+  }
+}
+
+
 // Animations
-@keyframes fadeInUp {
+@keyframes slideInFromRight {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateX(50px);
   }
-
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
 
 @keyframes skeleton-loading {
   0% {
-    background-position: -200% 0;
+    transform: translateX(-100%);
   }
-
   100% {
-    background-position: 200% 0;
+    transform: translateX(100%);
   }
 }

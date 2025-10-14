@@ -1,111 +1,105 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
 
-class Reel extends Model {}
-
-Reel.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false
-    },
-    caption: {
-      type: DataTypes.STRING(2200),
-      allowNull: true
-    },
-    hashtags: {
-      type: DataTypes.JSON,
-      allowNull: false,
-      defaultValue: []
-    },
-    aiTags: {
-      type: DataTypes.JSON,
-      allowNull: false,
-      defaultValue: []
-    },
-    musicTrack: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    videoUrl: {
-      type: DataTypes.STRING(1024),
-      allowNull: false
-    },
-    thumbnailUrl: {
-      type: DataTypes.STRING(1024),
-      allowNull: true
-    },
-    duration: {
-      type: DataTypes.FLOAT,
-      allowNull: true
-    },
-    width: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    height: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    status: {
-      type: DataTypes.ENUM('pending', 'processing', 'ready', 'failed'),
-      allowNull: false,
-      defaultValue: 'pending'
-    },
-    processingErrors: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-    visibility: {
-      type: DataTypes.ENUM('public', 'friends', 'private'),
-      allowNull: false,
-      defaultValue: 'public'
-    },
-    allowComments: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true
-    },
-    processingProgress: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
-    viewsCount: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      defaultValue: 0
-    },
-    likesCount: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      defaultValue: 0
-    },
-    commentsCount: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      defaultValue: 0
-    },
-    completionRate: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-      defaultValue: 0
-    },
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-    deletedAt: DataTypes.DATE
+// Bảng Reel: lưu thông tin video ngắn (Reels/Shorts)
+const Reel = sequelize.define('Reel', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
-  {
-    sequelize,
-    modelName: 'Reel',
-    tableName: 'reels',
-    paranoid: true
-  }
-);
+  uuid: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    unique: true,
+    allowNull: false,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  caption: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  music: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  tags: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: [],
+  },
+  originUrl: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  videoUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  thumbnailUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  duration: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
+  width: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  height: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  size: {
+    type: DataTypes.BIGINT,
+    allowNull: true,
+  },
+  status: {
+    type: DataTypes.ENUM('pending', 'processing', 'completed', 'failed'),
+    defaultValue: 'pending',
+    allowNull: false,
+  },
+  processingProgress: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  failedReason: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  views: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  likesCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  commentsCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  visibility: {
+    type: DataTypes.ENUM('public', 'friends', 'private'),
+    defaultValue: 'public',
+    allowNull: false,
+  },
+  publishedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+}, {
+  paranoid: true,
+  timestamps: true,
+});
 
 export default Reel;

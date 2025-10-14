@@ -12,7 +12,6 @@
   position: sticky;
   top: 0;
   z-index: var(--w-zindex-sticky);
-  @include shadow(sm);
 
   @include breakpoint(tablet-and-below) {
     height: var(--w-header-height-mobile);
@@ -125,7 +124,7 @@
       padding: var(--w-spacing-md);
       border-bottom: var(--w-border-width) var(--w-border-style) var(--w-border-color);
       margin-bottom: var(--w-spacing-sm);
-      @include flex(row, flex-start, center);
+      @include flex(column, flex-start, stretch);
       gap: var(--w-spacing-sm);
 
       &__avatar {

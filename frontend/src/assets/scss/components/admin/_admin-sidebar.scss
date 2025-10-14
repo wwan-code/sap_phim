@@ -14,7 +14,6 @@
   background-color: var(--w-sidebar-bg);
   border-right: var(--w-border-width) var(--w-border-style) var(--w-border-color);
   transition: transform var(--w-transition-ease);
-  @include shadow(md);
 
   @include breakpoint(tablet-and-below) {
     width: var(--w-sidebar-width-mobile);

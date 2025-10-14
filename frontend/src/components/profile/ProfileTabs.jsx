@@ -1,14 +1,15 @@
 import React from 'react';
-import { FaHeart, FaUserFriends, FaHistory, FaCog } from 'react-icons/fa';
+import { FaHeart, FaUserFriends, FaHistory, FaCog, FaInfo, FaInfoCircle } from 'react-icons/fa';
 import classNames from '@/utils/classNames';
 
 const ProfileTabs = ({ activeTab, setActiveTab, isOwnProfile = true }) => {
   const tabs = [
     { id: 'friends', label: 'Bạn bè', icon: <FaUserFriends /> },
-    { id: 'favorites', label: 'Phim yêu thích', icon: <FaHeart /> },
-    { id: 'history', label: 'Lịch sử xem', icon: <FaHistory /> },
-    // Chỉ hiển thị tab Settings cho profile của chính mình
-    ...(isOwnProfile ? [{ id: 'settings', label: 'Cài đặt', icon: <FaCog /> }] : []),
+    { id: 'favorites', label: 'yêu thích', icon: <FaHeart /> },
+    { id: 'history', label: 'Lịch sử', icon: <FaHistory /> },
+    ...(isOwnProfile ? [
+      { id: 'edit-profile', label: 'Thông tin', icon: <FaInfoCircle /> },
+    ] : []),
   ];
 
   return (

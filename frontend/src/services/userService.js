@@ -46,8 +46,12 @@ const getUserWatchHistoryByUuid = async (uuid, page = 1, limit = 10) => {
   return res.data;
 };
 
-const getUserFriendsByUuid = async (uuid) => {
-  const res = await api.get(`/users/${uuid}/friends`);
+// Lấy danh sách bạn bè của người dùng theo UUID với pagination
+const getUserFriendsByUuid = async (uuid, params = {}) => {
+  const { page = 1, limit = 10 } = params;
+  const res = await api.get(`/users/${uuid}/friends`, {
+    params: { page, limit }
+  });
   return res.data;
 };
 

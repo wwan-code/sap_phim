@@ -21,12 +21,10 @@ const logout = () => {
   return api.post('/auth/logout');
 };
 
-const authService = {
+export {
   register,
   login,
   socialLogin,
   refreshToken,
   logout,
 };
-
-export default authService;

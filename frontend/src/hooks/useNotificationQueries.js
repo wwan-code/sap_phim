@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 import notificationService from '@/services/notificationService';
 import { useNotificationStore } from '@/stores/notificationStore';
 
@@ -15,6 +16,7 @@ const NOTIFICATION_QUERY_KEYS = {
 export const useNotificationQueries = () => {
   const queryClient = useQueryClient();
   const { activeTab } = useNotificationStore();
+  const { accessToken } = useSelector((state) => state.auth);
 
   // 1. Query để lấy danh sách thông báo (infinite scroll)
   const {
@@ -36,6 +38,7 @@ export const useNotificationQueries = () => {
       return undefined;
     },
     staleTime: 1000 * 60 * 2, // 2 phút
+    enabled: !!accessToken, // Chỉ fetch khi đã đăng nhập
   });
 
   // 2. Query để lấy số lượng thông báo chưa đọc
@@ -44,6 +47,7 @@ export const useNotificationQueries = () => {
     queryFn: notificationService.fetchUnreadCount,
     staleTime: 1000 * 60, // 1 phút
     refetchOnWindowFocus: true,
+    enabled: !!accessToken, // Chỉ fetch khi đã đăng nhập
   });
 
   // Helper function để xử lý optimistic update và invalidate cache
@@ -124,5 +128,8 @@ export const useNotificationQueries = () => {
     markAllAsRead,
     deleteNotification,
     invalidateQueries, // export để dùng trong socket manager
+    clearNotificationCache: () => {
+      queryClient.removeQueries({ queryKey: NOTIFICATION_QUERY_KEYS.all });
+    },
   };
 };

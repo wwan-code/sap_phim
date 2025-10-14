@@ -1,14 +1,13 @@
-import React, { useRef, useCallback } from 'react';
+﻿import React, { useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import useCustomScrollbar from '@/hooks/useCustomScrollbar';
 
-// Hàm tiện ích để lấy tiêu đề mặc định
 const getDefaultTitle = (titles) => {
-  if (!titles || titles.length === 0) return "Không có tiêu đề";
+  if (!titles || titles.length === 0) return "KhÃ´ng cÃ³ tiÃªu Ä‘á»";
   const defaultTitle = titles.find(t => t.type === 'default');
   return defaultTitle ? defaultTitle.title : titles[0].title;
 };
 
-// Component để highlight từ khóa
 const Highlight = ({ text, highlight }) => {
   if (!highlight.trim()) {
     return <span>{text}</span>;
@@ -27,9 +26,8 @@ const Highlight = ({ text, highlight }) => {
 const SearchResultDropdown = ({ results, isLoading, loadMore, hasMore, query, error, onClose }) => {
   const navigate = useNavigate();
   const observer = useRef();
+  const { containerRef, scrollbarRef } = useCustomScrollbar([results.length, isLoading]);
 
-  // Callback ref cho phần tử cuối cùng trong danh sách
-  // Khi phần tử này xuất hiện trên màn hình, sẽ trigger loadMore
   const lastResultElementRef = useCallback(node => {
     if (isLoading) return;
     if (observer.current) observer.current.disconnect();
@@ -42,11 +40,10 @@ const SearchResultDropdown = ({ results, isLoading, loadMore, hasMore, query, er
   }, [isLoading, hasMore, loadMore]);
 
   const handleResultClick = (slug) => {
-    onClose(); // Đóng dropdown
-    navigate(`/movie/${slug}`); // Điều hướng
+    onClose();
+    navigate(`/movie/${slug}`);
   };
 
-  // Render nội dung của dropdown
   const renderContent = () => {
     if (isLoading) {
       return <div className="search-results__message">Đang tìm kiếm...</div>;
@@ -55,10 +52,10 @@ const SearchResultDropdown = ({ results, isLoading, loadMore, hasMore, query, er
         return <div className="search-results__message search-results__message--error">{error}</div>;
     }
     if (results.length === 0 && query) {
-      return <div className="search-results__message">Không tìm thấy phim nào cho "{query}"</div>;
+      return <div className="search-results__message">KhÃ´ng tÃ¬m tháº¥y phim nÃ o cho "{query}"</div>;
     }
     if (results.length === 0 && !query) {
-        return <div className="search-results__message">Gõ để bắt đầu tìm kiếm.</div>;
+        return <div className="search-results__message">GÃµ Ä‘á»ƒ báº¯t Ä‘áº§u tÃ¬m kiáº¿m.</div>;
     }
 
     return (
@@ -92,16 +89,24 @@ const SearchResultDropdown = ({ results, isLoading, loadMore, hasMore, query, er
     );
   };
 
+  const hasContent = results.length > 0 || isLoading || error;
+
   return (
-    <div className="search-results">
-      {renderContent()}
-      {!isLoading && hasMore && (
-        <div className="search-results__load-more">
-          Đang tải thêm...
-        </div>
-      )}
+    <div className={`search-results ${hasContent ? 'search-results--has-content' : ''}`}>
+      <div className="search-results__container" ref={containerRef}>
+        {renderContent()}
+        {!isLoading && hasMore && (
+          <div className="search-results__load-more">
+            Äang táº£i thÃªm...
+          </div>
+        )}
+      </div>
+      <div className="search-results__scrollbar">
+        <div className="search-results__scrollbar-thumb" ref={scrollbarRef}></div>
+      </div>
     </div>
   );
 };
 
 export default SearchResultDropdown;
+

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, createContext } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useState, useEffect, createContext, useMemo } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import ScrollToTop from '@/components/common/ScrollToTop';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import Footer from '@/components/layout/Footer';
@@ -17,7 +18,8 @@ const AppLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
-
+  const location = useLocation();
+  const isChatPage = useMemo(() => location.pathname.includes('/chat'), [location.pathname]);
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -40,6 +42,7 @@ const AppLayout = () => {
   return (
     <AuthPopupContext.Provider value={{ openAuthPopup }}>
       <div className="app-layout">
+        <ScrollToTop />
         <Header toggleSidebar={toggleSidebar} />
         {deviceType !== 'desktop' && (
           <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
@@ -47,9 +50,11 @@ const AppLayout = () => {
         <main className="app-layout__main">
           <Outlet />
         </main>
-        <Footer />
+        {
+          !isChatPage && <Footer />
+        }
         {!user && <AuthPopup isOpen={isAuthPopupOpen} onClose={closeAuthPopup} />}
-        <ChatAIPopup /> {/* Tích hợp ChatAIPopup */}
+        {!isChatPage && <ChatAIPopup />}
       </div>
     </AuthPopupContext.Provider>
   );

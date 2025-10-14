@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import movieService from '@/services/movieService';
 import '@/assets/scss/pages/_movie-watch-page.scss';
 
-// Import new components
 import PlayerContainer from '@/components/watch/PlayerContainer';
 import MovieInfo from '@/components/watch/MovieInfo';
 import Sidebar from '@/components/watch/Sidebar';
-import WatchPageSkeleton from '@/components/skeletons/WatchPageSkeleton';
 import MovieMeta from '@/components/watch/MovieMeta';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import watchHistoryService from '@/services/watchHistoryService';
 import { useSelector } from 'react-redux';
 import CommentSection from '@/components/comments/CommentSection';
@@ -25,6 +25,7 @@ const MovieWatchPage = () => {
   const [error, setError] = useState(null);
   const [isCinemaMode, setIsCinemaMode] = useState(false);
   const [autoNext, setAutoNext] = useState(true);
+  const watchProgressRef = useRef(0); // Use ref to store progress for interval
 
   const toggleCinemaMode = () => {
     setIsCinemaMode(prevMode => !prevMode);
@@ -37,7 +38,6 @@ const MovieWatchPage = () => {
       document.body.classList.remove('cinema-mode');
     }
 
-    // Cleanup function to remove the class when the component unmounts
     return () => {
       document.body.classList.remove('cinema-mode');
     };
@@ -47,60 +47,53 @@ const MovieWatchPage = () => {
     const fetchWatchPageData = async () => {
       try {
         setLoading(true);
-        const movieResponse = await movieService.getMovieById(slug);
-        if (movieResponse.success) {
-          setMovie(movieResponse.data);
-
-          const episodesResponse = await movieService.getMovieEpisodes(movieResponse.data.id);
-          if (episodesResponse.success) {
-            setEpisodes(episodesResponse.data);
-            const episode = episodesResponse.data?.find(
-              (ep) => ep.episodeNumber === parseInt(episodeNumber, 10)
-            );
-            if (episode) {
-              setCurrentEpisode(episode);
-            } else {
-              setError('Tập phim không tồn tại.');
-            }
-          } else {
-            setError('Không thể tải danh sách tập phim.');
-          }
-
-          const recommendedResponse = await movieService.getRecommendedMovies(movieResponse.data.id, { limit: 5 });
-          if (recommendedResponse.success) {
-            setRecommendedMovies(recommendedResponse.data);
-          } else {
-            console.warn('Không thể tải danh sách phim đề xuất.');
-          }
+        const response = await movieService.getMovieWatchDataBySlug(slug, episodeNumber);
+        if (response.success) {
+          const { movie, currentEpisode, episodes, recommendedMovies, watchProgress } = response.data;
+          setMovie(movie);
+          setEpisodes(episodes);
+          setCurrentEpisode(currentEpisode);
+          setRecommendedMovies(recommendedMovies);
+          watchProgressRef.current = watchProgress; 
         } else {
-          setError('Phim không được tìm thấy.');
+          setError('Phim hoặc tập phim không được tìm thấy.');
         }
       } catch (err) {
-        setError(err.message || 'Lỗi khi tải dữ liệu phim.');
-        console.error(err);
+        setError(err.response?.data?.message || err.message || 'Lỗi khi tải dữ liệu phim.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchWatchPageData();
-  }, [slug, episodeNumber]);
+  }, [slug, episodeNumber, currentUser]);
 
-  // Save progress periodically and on unmount
   useEffect(() => {
-    if (!movie || !currentEpisode) return;
-    let seconds = 0;
+    if (!movie || !currentEpisode || !currentUser) return;
+
     const interval = setInterval(() => {
-      seconds += 5;
-      watchHistoryService.saveProgress({ movieId: movie.id, episodeId: currentEpisode.id, progress: seconds, timestamp: new Date().toISOString() }).catch(() => {});
+      watchProgressRef.current += 5;
+      watchHistoryService.saveProgress({ 
+        movieId: movie.id, 
+        episodeId: currentEpisode.id, 
+        progress: watchProgressRef.current, 
+        timestamp: new Date().toISOString() 
+      }).catch((e) => console.error("Error saving watch history:", e));
     }, 5000);
+
     return () => {
       clearInterval(interval);
-      if (seconds > 0) {
-        watchHistoryService.saveProgress({ movieId: movie.id, episodeId: currentEpisode.id, progress: seconds, timestamp: new Date().toISOString() }).catch(() => {});
+      // Save final progress when component unmounts or dependencies change
+      if (watchProgressRef.current > 0) {
+        watchHistoryService.saveProgress({ 
+          movieId: movie.id, 
+          episodeId: currentEpisode.id, 
+          progress: watchProgressRef.current, 
+          timestamp: new Date().toISOString() 
+        }).catch((e) => console.error("Error saving final watch history:", e));
       }
     };
-  }, [movie, currentEpisode]);
+  }, [movie, currentEpisode, currentUser]);
 
   const handleEpisodeChange = (newEpisodeNumber) => {
     navigate(`/watch/${slug}/episode/${newEpisodeNumber}`);
@@ -119,6 +112,7 @@ const MovieWatchPage = () => {
   };
 
   const hasNextEpisode = () => {
+    if (!currentEpisode || !episodes || episodes.length === 0) return false;
     const sortedEpisodes = episodes.sort((a, b) => a.episodeNumber - b.episodeNumber);
     const currentEpisodeIndex = sortedEpisodes.findIndex(
       (ep) => ep.episodeNumber === currentEpisode.episodeNumber
@@ -127,15 +121,32 @@ const MovieWatchPage = () => {
   };
 
   if (loading) {
-    return <WatchPageSkeleton />;
+    return <LoadingSpinner fullscreen label="Đang tải phim..." />;
   }
 
   if (error) {
-    return <div className="error-message-full-page">{error}</div>;
+    return (
+      <div className="container-fluid page-container">
+        <ErrorMessage
+          variant="card"
+          title="Lỗi tải phim"
+          message={error}
+          onRetry={() => window.location.reload()} // Simple retry by reloading
+        />
+      </div>
+    );
   }
 
   if (!movie || !currentEpisode) {
-    return <div className="error-message-full-page">Không có dữ liệu để hiển thị.</div>;
+    return (
+      <div className="container-fluid page-container">
+        <ErrorMessage
+          variant="card"
+          title="Không tìm thấy dữ liệu"
+          message="Không có dữ liệu phim hoặc tập phim để hiển thị."
+        />
+      </div>
+    );
   }
 
   const defaultTitle = movie.titles?.find((t) => t.type === 'default')?.title || 'Untitled';
@@ -143,7 +154,7 @@ const MovieWatchPage = () => {
   return (
     <div className="movie-watch-page">
       <div className="movie-watch-page__main-content">
-        <PlayerContainer episode={currentEpisode} movieTitle={defaultTitle} />
+        <PlayerContainer episode={currentEpisode} movieTitle={defaultTitle} initialProgress={watchProgressRef.current} />
         <MovieInfo
           movie={movie}
           currentEpisode={currentEpisode}
@@ -153,15 +164,13 @@ const MovieWatchPage = () => {
           hasNextEpisode={hasNextEpisode()}
         />
         <MovieMeta movie={movie} />
-        <section id="comments" className="comments-section-placeholder">
-          <CommentSection
-            contentType="episode"
-            contentId={currentEpisode.id}
-            currentUser={currentUser}
-            showEpisodeFilter={false} // For episode page, only show comments for this episode
-            moderationMode={true}
-          />
-        </section>
+        <CommentSection
+          contentType="episode"
+          contentId={currentEpisode.id}
+          currentUser={currentUser}
+          showEpisodeFilter={false}
+          moderationMode={true}
+        />
       </div>
 
       <Sidebar

@@ -1,13 +1,9 @@
+@use '../variables' as *;
 @use '../mixins' as *;
 
 .friend-request-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--w-spacing-md);
-  padding: var(--w-spacing-md);
-
-  @include breakpoint(mobile) {
-    grid-template-columns: 1fr;
-    padding: var(--w-spacing-sm);
-  }
+  padding: var(--w-spacing-md) 0;
 }

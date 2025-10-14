@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from '@/utils/classNames';
-import '@/assets/scss/components/_pagination.scss';
+import '@/assets/scss/components/common/_pagination.scss';
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const pages = [...Array(totalPages).keys()].map(i => i + 1);

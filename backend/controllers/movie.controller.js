@@ -43,7 +43,7 @@ const getMovies = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Lấy chi tiết một phim
+ * @desc    Lấy chi tiết một phim (dành cho admin)
  * @route   GET /api/movies/:id
  * @access  Public
  */
@@ -57,6 +57,48 @@ const getMovieById = asyncHandler(async (req, res) => {
   } else {
     res.status(404);
     throw new Error('Phim không được tìm thấy.');
+  }
+});
+
+/**
+ * @desc    Lấy chi tiết phim theo slug (dành cho người dùng)
+ * @route   GET /api/movie/detail/:slug
+ * @access  Public (Optional Auth)
+ */
+const getMovieDetail = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+  const userId = req.user ? req.user.id : null; // userId sẽ có nếu verifyTokenOptional thành công
+
+  const { movie, isFavorite } = await movieService.getMovieDetailBySlug(slug, userId);
+  if (movie) {
+    res.status(200).json({
+      success: true,
+      data: { ...movie.toJSON(), isFavorite },
+    });
+  } else {
+    res.status(404);
+    throw new Error('Phim không được tìm thấy.');
+  }
+});
+
+/**
+ * @desc    Lấy dữ liệu xem phim theo slug và episodeNumber (dành cho người dùng)
+ * @route   GET /api/movie/watch/:slug/episode/:episodeNumber?
+ * @access  Public (Optional Auth)
+ */
+const getMovieWatchData = asyncHandler(async (req, res) => {
+  const { slug, episodeNumber } = req.params;
+  const userId = req.user ? req.user.id : null; // userId sẽ có nếu verifyTokenOptional thành công
+
+  const result = await movieService.getMovieWatchDataBySlug(slug, episodeNumber, userId);
+  if (result.movie) {
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } else {
+    res.status(404);
+    throw new Error('Phim hoặc tập phim không được tìm thấy.');
   }
 });
 
@@ -249,4 +291,6 @@ export {
   getRecommendedMovies,
   getTop10Movies,
   getTheaterMovies,
+  getMovieDetail,
+  getMovieWatchData,
 };

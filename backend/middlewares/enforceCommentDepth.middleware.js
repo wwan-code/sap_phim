@@ -24,7 +24,6 @@ const enforceCommentDepth = async (req, res, next) => {
             if (ancestor) {
                 currentDepth++;
             } else {
-                // Should not happen if parentId references are correct, but as a safeguard
                 break;
             }
         }

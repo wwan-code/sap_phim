@@ -1,183 +1,352 @@
 import { io } from 'socket.io-client';
 import { store } from '@/store';
-import { onFriendRequestReceived, onFriendRequestSent, onFriendshipStatusUpdated, onUserStatusUpdate, invalidateFriends, invalidatePendingRequests, invalidateSentRequests } from '@/store/slices/friendSlice'; // Import friend-related actions and invalidate actions
-import { setCurrentUserOnlineStatus } from '@/store/slices/authSlice'; // Import action to update current user's online status
+import { onUserStatusUpdate } from '@/store/slices/friendSlice';
+import { setCurrentUserOnlineStatus } from '@/store/slices/authSlice';
 import { queryClient } from '@/utils/queryClient';
+import { friendQueryKeys } from '@/hooks/useFriendQueries';
 
-// Sử dụng biến môi trường riêng cho Socket.IO URL
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 let socket = null;
+let handlersRegistered = false;
 
-/**
- * @desc Khởi tạo kết nối Socket.IO
- * @returns {Socket} Đối tượng socket đã kết nối
- */
+const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_DELAY = 1000;
+
+const eventQueue = [];
+let isProcessingQueue = false;
+
+const NOTIFICATION_QUERY_KEYS = {
+  all: ['notifications'],
+  lists: () => [...NOTIFICATION_QUERY_KEYS.all, 'list'],
+  unreadCount: () => [...NOTIFICATION_QUERY_KEYS.all, 'unread-count'],
+};
+
+const getCurrentUserId = () => store.getState().auth.user?.id ?? null;
+
+const debounce = (fn, wait = 300) => {
+  let timeoutId = null;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), wait);
+  };
+};
+
+const batchInvalidate = (() => {
+  const pending = new Set();
+  let timerId = null;
+
+  return (queryKey) => {
+    pending.add(JSON.stringify(queryKey));
+
+    if (timerId) {
+      return;
+    }
+
+    timerId = setTimeout(() => {
+      pending.forEach((serializedKey) => {
+        const key = JSON.parse(serializedKey);
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+      pending.clear();
+      timerId = null;
+    }, 100);
+  };
+})();
+
+const optimisticUpdate = {
+  notification: (newNotification) => {
+    queryClient.setQueryData(
+      NOTIFICATION_QUERY_KEYS.unreadCount(),
+      (oldData) => {
+        const currentCount = typeof oldData === 'number' ? oldData : 0;
+        return currentCount + 1;
+      }
+    );
+
+    queryClient.setQueriesData(
+      { queryKey: NOTIFICATION_QUERY_KEYS.lists() },
+      (oldData) => {
+        if (!oldData?.pages) {
+          return oldData;
+        }
+
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page, index) => {
+            if (index === 0) {
+              const existing = Array.isArray(page.data) ? page.data : [];
+              return {
+                ...page,
+                data: [newNotification, ...existing],
+              };
+            }
+            return page;
+          }),
+        };
+      }
+    );
+  },
+  comment: (() => {
+    const invalidate = debounce(() => {
+      batchInvalidate(['comments']);
+      batchInvalidate(['replies']);
+    }, 500);
+
+    return () => invalidate();
+  })(),
+  userStatus: (userId, online, lastOnline) => {
+    const currentUserId = getCurrentUserId();
+
+    if (userId === currentUserId) {
+      store.dispatch(setCurrentUserOnlineStatus({ online, lastOnline }));
+      return;
+    }
+
+    store.dispatch(onUserStatusUpdate({ userId, online, lastOnline }));
+  },
+};
+
+const processEventQueue = () => {
+  if (isProcessingQueue || eventQueue.length === 0) {
+    return;
+  }
+
+  isProcessingQueue = true;
+  while (eventQueue.length > 0) {
+    const { event, handler, data } = eventQueue.shift();
+    try {
+      handler(data);
+    } catch (error) {
+      console.error(`Socket queue handler failed for event ${event}:`, error);
+    }
+  }
+  isProcessingQueue = false;
+};
+
+const queueEvent = (event, handler, data) => {
+  eventQueue.push({ event, handler, data });
+  if (socket?.connected) {
+    processEventQueue();
+  }
+};
+
+const handleNotificationPatch = (id, patch) => {
+  queryClient.setQueriesData(
+    { queryKey: NOTIFICATION_QUERY_KEYS.lists() },
+    (oldData) => {
+      if (!oldData?.pages) {
+        return oldData;
+      }
+
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          data: Array.isArray(page.data)
+            ? page.data.map((notification) =>
+                notification.id === id ? { ...notification, ...patch } : notification
+              )
+            : page.data,
+        })),
+      };
+    }
+  );
+};
+
+const handleNotificationDelete = (id) => {
+  queryClient.setQueriesData(
+    { queryKey: NOTIFICATION_QUERY_KEYS.lists() },
+    (oldData) => {
+      if (!oldData?.pages) {
+        return oldData;
+      }
+
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          data: Array.isArray(page.data)
+            ? page.data.filter((notification) => notification.id !== id)
+            : page.data,
+        })),
+      };
+    }
+  );
+};
+
+const markNotificationsAsRead = () => {
+  queryClient.setQueriesData(
+    { queryKey: NOTIFICATION_QUERY_KEYS.lists() },
+    (oldData) => {
+      if (!oldData?.pages) {
+        return oldData;
+      }
+
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page) => ({
+          ...page,
+          data: Array.isArray(page.data)
+            ? page.data.map((notification) => ({ ...notification, isRead: true }))
+            : page.data,
+        })),
+      };
+    }
+  );
+
+  queryClient.setQueryData(NOTIFICATION_QUERY_KEYS.unreadCount(), 0);
+};
+
+const attachEventHandlers = () => {
+  if (!socket || handlersRegistered) {
+    return;
+  }
+
+  handlersRegistered = true;
+
+  // Notification events
+  socket.on('notification:new', (notification) => {
+    queueEvent('notification:new', () => optimisticUpdate.notification(notification), notification);
+  });
+
+  socket.on('notification:patch', ({ id, patch }) => {
+    queueEvent('notification:patch', () => handleNotificationPatch(id, patch), { id, patch });
+  });
+
+  socket.on('notification:delete', ({ id }) => {
+    queueEvent('notification:delete', () => handleNotificationDelete(id), { id });
+    batchInvalidate(NOTIFICATION_QUERY_KEYS.lists());
+    batchInvalidate(NOTIFICATION_QUERY_KEYS.unreadCount());
+  });
+
+  socket.on('notification:unread-count', ({ unread }) => {
+    queueEvent(
+      'notification:unread-count',
+      () => queryClient.setQueryData(NOTIFICATION_QUERY_KEYS.unreadCount(), unread ?? 0),
+      { unread }
+    );
+  });
+
+  socket.on('notification:all-cleared', () => {
+    queueEvent('notification:all-cleared', () => markNotificationsAsRead(), null);
+  });
+
+  socket.on('notification:all-read', () => {
+    queueEvent('notification:all-read', () => markNotificationsAsRead(), null);
+  });
+
+  // Friend request lifecycle events
+  socket.on('friend:request', (payload) => {
+    queueEvent('friend:request', () => {
+      queryClient.invalidateQueries({ queryKey: friendQueryKeys.pending() });
+    }, payload);
+  });
+
+  socket.on('friend:request:sent', (payload) => {
+    queueEvent('friend:request:sent', () => {
+      queryClient.invalidateQueries({ queryKey: friendQueryKeys.sent() });
+    }, payload);
+  });
+
+  socket.on('friendship:update', (payload) => {
+    queueEvent('friendship:update', () => {
+      queryClient.invalidateQueries({ queryKey: friendQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: friendQueryKeys.pending() });
+      queryClient.invalidateQueries({ queryKey: friendQueryKeys.sent() });
+      queryClient.invalidateQueries({ queryKey: friendQueryKeys.search('') });
+    }, payload);
+  });
+
+  // User status updates
+  socket.on('user_status_update', (data) => {
+    queueEvent('user_status_update', () => {
+      optimisticUpdate.userStatus(data.userId, data.online, data.lastOnline);
+    }, data);
+  });
+
+  // Comment activity events
+  const commentEvents = ['comment_created', 'comment_updated', 'comment_deleted', 'comment_liked'];
+  commentEvents.forEach((event) => {
+    socket.on(event, (data) => {
+      queueEvent(event, () => optimisticUpdate.comment(data, event), data);
+    });
+  });
+};
+
 export const initializeSocket = () => {
   if (socket) {
-    console.log('Socket đã được khởi tạo, không khởi tạo lại.');
     return socket;
   }
 
   const { accessToken } = store.getState().auth;
 
+  if (!accessToken) {
+    console.warn('Cannot initialise socket without an access token.');
+    return null;
+  }
+
   socket = io(SOCKET_URL, {
-    auth: {
-      token: accessToken,
-    },
-    transports: ['websocket', 'polling'], // Ưu tiên websocket, cho phép fallback sang polling
-    reconnectionAttempts: 5, // Thử kết nối lại 5 lần
-    reconnectionDelay: 1000, // Độ trễ 1 giây giữa các lần thử
+    auth: { token: accessToken },
+    transports: ['websocket', 'polling'],
+    reconnectionAttempts: MAX_RECONNECT_ATTEMPTS,
+    reconnectionDelay: RECONNECT_DELAY,
+    reconnectionDelayMax: 5000,
+    timeout: 20000,
   });
 
   socket.on('connect', () => {
-    console.log('Đã kết nối tới Socket.IO server:', socket.id);
+    socket.emit('notification:subscribe');
+    processEventQueue();
   });
 
   socket.on('disconnect', (reason) => {
-    console.log('Đã ngắt kết nối khỏi Socket.IO server:', reason);
-  });
-
-  socket.on('connect_error', (err) => {
-    console.error('Lỗi kết nối Socket.IO:', err.message);
-  });
-
-  socket.on('friendRequestReceived', (data) => {
-    store.dispatch(onFriendRequestReceived(data));
-    store.dispatch(invalidatePendingRequests()); // Lời mời đang chờ thay đổi
-  });
-
-  socket.on('friendRequestSent', (data) => {
-    store.dispatch(onFriendRequestSent(data));
-    store.dispatch(invalidateSentRequests()); // Lời mời đã gửi thay đổi
-  });
-
-  socket.on('friendshipStatusUpdated', (data) => {
-    store.dispatch(onFriendshipStatusUpdated(data));
-    store.dispatch(invalidateFriends()); // Danh sách bạn bè có thể thay đổi
-    store.dispatch(invalidatePendingRequests()); // Lời mời đang chờ có thể thay đổi (khi chấp nhận/từ chối)
-    store.dispatch(invalidateSentRequests()); // Lời mời đã gửi có thể thay đổi (khi chấp nhận/từ chối)
-  });
-
-  socket.on('user_status_update', (data) => {
-    const { userId, online, lastOnline } = data;
-    const currentUserId = store.getState().auth.user?.id;
-
-    if (userId === currentUserId) {
-      // Update current user's online status in authSlice
-      store.dispatch(setCurrentUserOnlineStatus({ online, lastOnline }));
-    } else {
-      // Update friend's online status in friendSlice
-      store.dispatch(onUserStatusUpdate({ userId, online, lastOnline }));
+    console.warn('Socket disconnected:', reason);
+    if (reason === 'io server disconnect') {
+      socket.connect();
     }
   });
 
-  // === Notification Events (Tích hợp với React Query) ===
-  const NOTIFICATION_QUERY_KEYS = {
-    all: ['notifications'],
-    lists: () => [...NOTIFICATION_QUERY_KEYS.all, 'list'],
-    unreadCount: () => [...NOTIFICATION_QUERY_KEYS.all, 'unread-count'],
-  };
-
-  // 1. Khi có thông báo mới
-  socket.on('notification:new', (newNotification) => {
-    console.log('Socket: Nhận thông báo mới', newNotification);
-    // Vô hiệu hóa query list để tự động fetch lại, đảm bảo dữ liệu luôn mới nhất
-    queryClient.invalidateQueries({ queryKey: NOTIFICATION_QUERY_KEYS.lists() });
-    // Tăng số lượng chưa đọc trong cache để UI cập nhật ngay lập tức
-    queryClient.setQueryData(NOTIFICATION_QUERY_KEYS.unreadCount(), (oldData) => {
-      const currentCount = typeof oldData === 'number' ? oldData : 0;
-      return currentCount + 1;
-    });
+  socket.on('connect_error', (error) => {
+    console.error('Socket connection error:', error.message);
   });
 
-  // 2. Khi có cập nhật (ví dụ: đánh dấu đã đọc từ thiết bị khác)
-  socket.on('notification:update', ({ id, patch }) => {
-    console.log(`Socket: Cập nhật thông báo ${id}`, patch);
-    // Cập nhật cache của list notifications
-    queryClient.setQueriesData({ queryKey: NOTIFICATION_QUERY_KEYS.lists() }, (oldData) => {
-      if (!oldData) return oldData;
-      return {
-        ...oldData,
-        pages: oldData.pages.map(page => ({
-          ...page,
-          data: page.data.map(n => (n.id === id ? { ...n, ...patch } : n)),
-        })),
-      };
-    });
-    // Đồng bộ lại số lượng chưa đọc
-    queryClient.invalidateQueries({ queryKey: NOTIFICATION_QUERY_KEYS.unreadCount() });
+  socket.io.on('reconnect', () => {
+    processEventQueue();
   });
 
-  // 3. Khi có thông báo bị xóa
-  socket.on('notification:delete', ({ id }) => {
-    console.log(`Socket: Xóa thông báo ${id}`);
-    queryClient.setQueriesData({ queryKey: NOTIFICATION_QUERY_KEYS.lists() }, (oldData) => {
-      if (!oldData) return oldData;
-      return {
-        ...oldData,
-        pages: oldData.pages.map(page => ({
-          ...page,
-          data: page.data.filter(n => n.id !== id),
-        })),
-      };
-    });
-    // Đồng bộ lại số lượng chưa đọc
-    queryClient.invalidateQueries({ queryKey: NOTIFICATION_QUERY_KEYS.unreadCount() });
-  });
-
-  // 4. Khi số lượng chưa đọc thay đổi từ server
-  socket.on('notification:unread-count', ({ unread }) => {
-    console.log('Socket: Cập nhật số lượng chưa đọc', unread);
-    queryClient.setQueryData(NOTIFICATION_QUERY_KEYS.unreadCount(), unread);
-  });
-
-
-  // Comment events
-  socket.on('comment_created', (data) => {
-    // Invalidate comment queries to refetch data
-    queryClient.invalidateQueries({ queryKey: ['comments'] });
-    queryClient.invalidateQueries({ queryKey: ['replies'] });
-  });
-
-  socket.on('comment_updated', (data) => {
-    // Invalidate comment queries to refetch data
-    queryClient.invalidateQueries({ queryKey: ['comments'] });
-    queryClient.invalidateQueries({ queryKey: ['replies'] });
-  });
-
-  socket.on('comment_deleted', (data) => {
-    // Invalidate comment queries to refetch data
-    queryClient.invalidateQueries({ queryKey: ['comments'] });
-    queryClient.invalidateQueries({ queryKey: ['replies'] });
-  });
-
-  socket.on('comment_liked', (data) => {
-    // Invalidate comment queries to refetch data
-    queryClient.invalidateQueries({ queryKey: ['comments'] });
-    queryClient.invalidateQueries({ queryKey: ['replies'] });
-  });
+  attachEventHandlers();
 
   return socket;
 };
 
-/**
- * @desc Lấy đối tượng socket hiện tại
- * @returns {Socket | null} Đối tượng socket hoặc null nếu chưa khởi tạo
- */
 export const getSocket = () => {
   if (!socket) {
-    console.warn('Socket chưa được khởi tạo. Vui lòng gọi initializeSocket() trước.');
+    console.warn('Socket has not been initialised. Call initializeSocket() first.');
   }
   return socket;
 };
 
-/**
- * @desc Ngắt kết nối Socket.IO
- */
 export const disconnectSocket = () => {
-  if (socket) {
-    socket.disconnect();
-    socket = null;
+  if (!socket) {
+    return;
   }
+
+  socket.removeAllListeners();
+  socket.disconnect();
+  socket = null;
+  handlersRegistered = false;
+  eventQueue.length = 0;
+};
+
+export const isSocketConnected = () => Boolean(socket?.connected);
+
+export const emitSocketEvent = (event, data) => {
+  if (socket?.connected) {
+    socket.emit(event, data);
+    return;
+  }
+
+  console.warn(`Socket offline; queueing event: ${event}`);
+  queueEvent(event, () => socket?.emit(event, data), data);
 };

@@ -1,17 +1,29 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import classNames from '@/utils/classNames';
-import { sendFriendRequest, acceptFriendRequest, rejectFriendRequest, removeFriend } from '@/store/slices/friendSlice';
-import { FaUserPlus, FaCheck, FaTimes, FaUserMinus, FaHourglassHalf } from 'react-icons/fa';
-import { formatDistanceToNow } from '@/utils/dateUtils'; // Import formatDistanceToNow
+import {
+  useSendFriendRequest,
+  useAcceptFriendRequest,
+  useRejectFriendRequest,
+  useRemoveFriend,
+} from '@/hooks/useFriendQueries';
+import { FaUserPlus, FaCheck, FaTimes, FaUserMinus, FaHourglassHalf, FaCommentDots } from 'react-icons/fa';
+import { formatDistanceToNow } from '@/utils/dateUtils';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
 import '@/assets/scss/components/_friend-card.scss';
 
 const FriendCard = ({ user, type }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.auth.user);
-  const isLoading = useSelector((state) => state.friends.loading);
+
+  // Sử dụng các mutation hooks từ React Query
+  const { mutate: sendRequest, isPending: isSending } = useSendFriendRequest();
+  const { mutate: acceptRequest, isPending: isAccepting } = useAcceptFriendRequest();
+  const { mutate: rejectRequest, isPending: isRejecting } = useRejectFriendRequest();
+  const { mutate: removeFriend, isPending: isRemoving } = useRemoveFriend();
+
+  const isLoading = isSending || isAccepting || isRejecting || isRemoving;
 
   // Xử lý click vào username để điều hướng đến profile
   const handleUsernameClick = (e) => {
@@ -23,23 +35,28 @@ const FriendCard = ({ user, type }) => {
   };
 
   const handleSendRequest = () => {
-    dispatch(sendFriendRequest(user.id));
+    sendRequest(user.id);
   };
 
   const handleAcceptRequest = () => {
-    dispatch(acceptFriendRequest(user.friendshipId)); // user.friendshipId sẽ là id của lời mời
+    acceptRequest(user.friendshipId); // user.friendshipId sẽ là id của lời mời
   };
 
   const handleRejectRequest = () => {
-    dispatch(rejectFriendRequest(user.friendshipId)); // user.friendshipId sẽ là id của lời mời
+    rejectRequest(user.friendshipId); // user.friendshipId sẽ là id của lời mời
   };
 
   const handleRemoveFriend = () => {
-    dispatch(removeFriend(user.id));
+    removeFriend(user.id);
+  };
+
+
+  const handleStartChat = () => {
+    
   };
 
   const renderActions = () => {
-    if (currentUser.id === user.id) {
+    if (currentUser && currentUser.id === user.id) {
       return null; // Không hiển thị nút hành động cho chính người dùng
     }
 
@@ -91,14 +108,24 @@ const FriendCard = ({ user, type }) => {
         return null;
       case 'accepted':
         return (
-          <button
-            className="friend-card__action-btn friend-card__action-btn--remove"
-            onClick={handleRemoveFriend}
-            disabled={isLoading}
-            title="Hủy kết bạn"
-          >
-            <FaUserMinus />
-          </button>
+          <>
+            <button
+              className="friend-card__action-btn friend-card__action-btn--chat"
+              onClick={handleStartChat}
+              disabled={isLoading}
+              title="Nhắn tin"
+            >
+              <FaCommentDots />
+            </button>
+            <button
+              className="friend-card__action-btn friend-card__action-btn--remove"
+              onClick={handleRemoveFriend}
+              disabled={isLoading}
+              title="Hủy kết bạn"
+            >
+              <FaUserMinus />
+            </button>
+          </>
         );
       case 'rejected':
         return (
@@ -131,7 +158,7 @@ const FriendCard = ({ user, type }) => {
     <div className="friend-card">
       <div className="friend-card__header">
         <div className="friend-card__avatar-wrapper">
-          <img src={user.avatarUrl ? `${import.meta.env.VITE_SERVER_URL}${user.avatarUrl}` : 'https://placehold.co/150?text=Avatar'} alt={user.username} className="friend-card__avatar" />
+          <img src={getAvatarUrl(user)} alt={user.username} className="friend-card__avatar" />
           <span 
             className={classNames('friend-card__status', {
               'friend-card__status--online': user.online,

@@ -15,7 +15,7 @@ import {
   facebookProvider,
   githubProvider,
 } from '@/utils/firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, EmailAuthProvider, fetchSignInMethodsForEmail } from 'firebase/auth';
 import classNames from '@/utils/classNames';
 import '@/assets/scss/components/_auth-popup.scss';
 
@@ -84,20 +84,59 @@ const AuthPopup = ({ isOpen, onClose }) => {
   };
 
   const handleSocialLogin = async (provider) => {
-    try {
-      let firebaseProvider;
-      if (provider === 'google') firebaseProvider = googleProvider;
-      else if (provider === 'facebook') firebaseProvider = facebookProvider;
-      else if (provider === 'github') firebaseProvider = githubProvider;
-      else throw new Error('Provider không hợp lệ.');
+    if (!auth) {
+      console.error("Lỗi: Firebase chưa được khởi tạo.");
+      return;
+  }
 
+  let firebaseProvider;
+  switch (provider) {
+      case "google":
+        firebaseProvider = googleProvider;
+          break;
+      case "facebook":
+        firebaseProvider = facebookProvider;
+          break;
+      case "github":
+        firebaseProvider = githubProvider;
+          break;
+      default:
+          console.error(`Lỗi: Nhà cung cấp "${provider}" không được hỗ trợ.`);
+          return;
+    }
+    try {
       const result = await signInWithPopup(auth, firebaseProvider);
       const idToken = await result.user.getIdToken();
-
       await dispatch(loginWithThirdParty({ idToken, provider })).unwrap();
-      // toast.success(`Đăng nhập bằng ${provider} thành công!`); // Handled by useEffect
+      toast.success(`Đăng nhập bằng ${provider} thành công!`);
     } catch (err) {
-      toast.error(err.message || `Đăng nhập bằng ${provider} thất bại.`);
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        const email = err.customData.email;
+        const pendingCredential = err.credential;
+
+        // Fetch previously used sign-in methods
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+
+        // Determine the first method found
+        const firstMethod = methods[0];
+
+        let errorMessage = `Tài khoản với email ${email} đã tồn tại. Vui lòng đăng nhập bằng `;
+
+        if (firstMethod === EmailAuthProvider.PROVIDER_ID) {
+          errorMessage += 'email và mật khẩu.';
+        } else if (firstMethod === googleProvider.providerId) {
+          errorMessage += 'Google.';
+        } else if (firstMethod === facebookProvider.providerId) {
+          errorMessage += 'Facebook.';
+        } else if (firstMethod === githubProvider.providerId) {
+          errorMessage += 'GitHub.';
+        } else {
+          errorMessage += 'phương thức đã đăng ký trước đó.';
+        }
+        toast.error(errorMessage);
+      } else {
+        toast.error(err.message || `Đăng nhập bằng ${provider} thất bại.`);
+      }
     }
   };
 

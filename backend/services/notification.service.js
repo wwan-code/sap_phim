@@ -5,6 +5,22 @@ import { Op } from 'sequelize';
 const { Notification, User } = db;
 
 /**
+ * Map notification type to settings key
+ */
+const getNotificationSettingKey = (type) => {
+  const typeMap = {
+    'friend_request': 'friendRequest',
+    'friend_request_status': 'friendRequestStatus',
+    'new_message': 'newMessage',
+    'new_comment': 'movieActivity',
+    'like_comment': 'movieActivity',
+    'user_mention': 'movieActivity',
+    'movie_update': 'movieActivity',
+  };
+  return typeMap[type] || null;
+};
+
+/**
  * @desc Tạo thông báo mới và emit qua Socket.IO cho người nhận.
  * @param {object} notificationData - Dữ liệu thông báo.
  * @param {number} notificationData.userId - ID của người nhận.
@@ -20,12 +36,27 @@ export const createNotification = async (notificationData) => {
   const { userId, type, title, body, senderId = null, link = null, metadata = {} } = notificationData;
 
   try {
-    // Kiểm tra xem người nhận có tồn tại không
-    const receiver = await User.findByPk(userId);
+    // Kiểm tra xem người nhận có tồn tại không và lấy notification settings
+    const receiver = await User.findByPk(userId, {
+      attributes: ['id', 'notificationSettings']
+    });
     if (!receiver) {
       // Không ném lỗi để tránh làm sập các tiến trình khác, chỉ ghi log
       console.error(`NotificationService: Người nhận với ID ${userId} không tồn tại.`);
       return null;
+    }
+
+    // Kiểm tra xem người dùng có bật thông báo cho loại này không
+    const settingKey = getNotificationSettingKey(type);
+    if (settingKey) {
+      const userSettings = receiver.notificationSettings || {};
+      const notifSetting = userSettings[settingKey];
+      
+      // Chỉ kiểm tra in-app notification (hiện tại chỉ hỗ trợ in-app)
+      if (!notifSetting || !notifSetting.inApp) {
+        console.log(`NotificationService: User ${userId} đã tắt thông báo ${type}.`);
+        return null; // Không tạo thông báo nếu user đã tắt
+      }
     }
 
     // Tạo thông báo trong CSDL
@@ -318,7 +349,30 @@ export const createBulkNotifications = async (bulkData) => {
   }
 
   try {
-    const notificationPayloads = userIds.map(userId => ({
+    // Lấy notification settings của tất cả users
+    const users = await User.findAll({
+      where: { id: { [Op.in]: userIds } },
+      attributes: ['id', 'notificationSettings']
+    });
+
+    // Lọc ra những user đã bật thông báo cho loại này
+    const settingKey = getNotificationSettingKey(type);
+    const filteredUserIds = users.filter(user => {
+      if (!settingKey) return true; // Nếu không map được, cho phép tạo (system message, etc.)
+      
+      const userSettings = user.notificationSettings || {};
+      const notifSetting = userSettings[settingKey];
+      
+      // Chỉ tạo nếu user đã bật in-app notification
+      return notifSetting && notifSetting.inApp;
+    }).map(user => user.id);
+
+    if (filteredUserIds.length === 0) {
+      console.log(`NotificationService: Không có user nào bật thông báo ${type}.`);
+      return { success: true, created: 0 };
+    }
+
+    const notificationPayloads = filteredUserIds.map(userId => ({
       userId,
       senderId,
       type,
